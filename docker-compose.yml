@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: spring-boot-basic-postgres-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hajji
+      POSTGRES_PASSWORD: hajji123
+      POSTGRES_DB: springbootdb
+    ports:
+      - "5433:5432"
+    volumes:
+      - spring_boot_basic_postgres_data:/var/lib/postgresql/data
+    networks:
+      - spring_boot_basic_network
+
+volumes:
+  spring_boot_basic_postgres_data:
+
+networks:
+  spring_boot_basic_network:
+    driver: bridge
