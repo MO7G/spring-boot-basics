@@ -30,7 +30,7 @@ public class UpdateUserRequestDTO {
     private String password;
 
     // Optional for updates, but you could require it on creation
-    private Boolean isActive = true;
+    private Boolean Active = true;
 
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
@@ -39,60 +39,60 @@ public class UpdateUserRequestDTO {
         return userId;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getModifiedAt() {
-        return modifiedAt;
-    }
-
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+
+    public String getFirstName() {
+        return firstName;
     }
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
+    public String getLastName() {
+        return lastName;
+    }
+
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public void setIsActive(Boolean active) {
-        isActive = active;
+    public Boolean getActive() {
+        return Active;
+    }
+
+    public void setActive(Boolean active) {
+        Active = active;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getModifiedAt() {
+        return modifiedAt;
     }
 
     public void setModifiedAt(LocalDateTime modifiedAt) {

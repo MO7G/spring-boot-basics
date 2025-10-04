@@ -16,7 +16,7 @@ public class UserMapper {
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setEmail(dto.getEmail());
-        user.setIsActive(dto.getIsActive());
+        user.setActive(dto.getActive());
         user.setCreatedAt(dto.getCreatedAt());
         user.setModifiedAt(dto.getModifiedAt());
         return user;
@@ -25,13 +25,11 @@ public class UserMapper {
     public static User toEntity(CreateUserRequestDTO dto) {
         if (dto == null) return null;
         User user = new User();
-        user.setUserId(dto.getUserId());
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setEmail(dto.getEmail());
-        user.setIsActive(dto.getIsActive());
-        user.setCreatedAt(dto.getCreatedAt());
-        user.setModifiedAt(dto.getModifiedAt());
+        user.setPasswordHash(dto.getPassword());
+        user.setActive(dto.getIsActive());
         return user;
     }
 
@@ -46,7 +44,7 @@ public class UserMapper {
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
         dto.setEmail(user.getEmail());
-        dto.setIsActive(user.getIsActive());
+        dto.setIsActive(user.getActive());
         dto.setCreatedAt(user.getCreatedAt());
         dto.setModifiedAt(user.getModifiedAt());
         return dto;

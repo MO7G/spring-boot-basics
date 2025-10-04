@@ -30,5 +30,51 @@ public class DocumentStatus {
     @OneToMany(mappedBy = "status")
     private Set<ProjectDocument> projectDocuments = new HashSet<>();
 
-    // Getters & Setters
+    public Integer getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(Integer statusId) {
+        this.statusId = statusId;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getModifiedAt() {
+        return modifiedAt;
+    }
+
+    public void setModifiedAt(LocalDateTime modifiedAt) {
+        this.modifiedAt = modifiedAt;
+    }
+
+    public Set<ProjectDocument> getProjectDocuments() {
+        return projectDocuments;
+    }
+
+    public void setProjectDocuments(Set<ProjectDocument> projectDocuments) {
+        this.projectDocuments = projectDocuments;
+    }
 }

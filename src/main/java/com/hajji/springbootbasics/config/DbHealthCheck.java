@@ -19,6 +19,11 @@ public class DbHealthCheck implements CommandLineRunner {
         this.dataSource = dataSource;
     }
 
+
+
+
+
+
     @Override
     public void run(String... args) throws Exception {
         try (Connection conn = dataSource.getConnection()) {

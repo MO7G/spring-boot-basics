@@ -1,6 +1,8 @@
 package com.hajji.springbootbasics.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -29,10 +31,13 @@ public class User {
     @Column(name = "IsActive")
     private Boolean isActive = true;
 
-    @Column(name = "CreatedAt")
+    @Column(name = "CreatedAt", insertable = false, updatable = false)
+    @Generated(value = GenerationTime.INSERT)
     private LocalDateTime createdAt;
 
-    @Column(name = "ModifiedAt")
+
+    @Column(name = "ModifiedAt", insertable = false, updatable = false)
+    @Generated(value = GenerationTime.INSERT)
     private LocalDateTime modifiedAt;
 
     /*--------------Relationships---------------*/
@@ -49,8 +54,13 @@ public class User {
 
 
     // One User -> Many FileStorage (uploaded files)
-    @OneToMany(mappedBy = "uploadedBy")
-    private Set<FileStorage> uploadedFiles = new HashSet<>();
+    @OneToMany(mappedBy = "uploadedByUser")
+    private Set<FileStorage> uploadedFilesByUser = new HashSet<>();
+
+
+
+    @OneToMany(mappedBy = "uploadedByUser")
+    private Set<FileStorage> uploadedFilesByCustomer = new HashSet<>();
 
     // One User -> Many ProjectAssignments
     @OneToMany(mappedBy = "user")
@@ -61,129 +71,121 @@ public class User {
     private Set<ProjectDocument> modifiedDocuments = new HashSet<>();
 
     // One User -> Many DocumentRevisions (modified by)
-    @OneToMany(mappedBy = "modifiedBy")
+    @OneToMany(mappedBy = "modifiedByUserId")
     private Set<DocumentRevision> documentRevisions = new HashSet<>();
 
+    public User() {
+    }
 
     public Integer getUserId() {
         return userId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getModifiedAt() {
-        return modifiedAt;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public Set<FileStorage> getUploadedFiles() {
-        return uploadedFiles;
-    }
-
-    public Set<ProjectAssignment> getProjectAssignments() {
-        return projectAssignments;
-    }
-
-    public Set<ProjectDocument> getModifiedDocuments() {
-        return modifiedDocuments;
-    }
-
-    public Set<DocumentRevision> getDocumentRevisions() {
-        return documentRevisions;
     }
 
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
 
-    public void setIsActive(Boolean active) {
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
         isActive = active;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
+    public LocalDateTime getModifiedAt() {
+        return modifiedAt;
+    }
+
     public void setModifiedAt(LocalDateTime modifiedAt) {
         this.modifiedAt = modifiedAt;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
     }
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
-    public void setUploadedFiles(Set<FileStorage> uploadedFiles) {
-        this.uploadedFiles = uploadedFiles;
+    public Set<FileStorage> getUploadedFilesByUser() {
+        return uploadedFilesByUser;
+    }
+
+    public void setUploadedFilesByUser(Set<FileStorage> uploadedFilesByUser) {
+        this.uploadedFilesByUser = uploadedFilesByUser;
+    }
+
+    public Set<FileStorage> getUploadedFilesByCustomer() {
+        return uploadedFilesByCustomer;
+    }
+
+    public void setUploadedFilesByCustomer(Set<FileStorage> uploadedFilesByCustomer) {
+        this.uploadedFilesByCustomer = uploadedFilesByCustomer;
+    }
+
+    public Set<ProjectAssignment> getProjectAssignments() {
+        return projectAssignments;
     }
 
     public void setProjectAssignments(Set<ProjectAssignment> projectAssignments) {
         this.projectAssignments = projectAssignments;
     }
 
+    public Set<ProjectDocument> getModifiedDocuments() {
+        return modifiedDocuments;
+    }
+
     public void setModifiedDocuments(Set<ProjectDocument> modifiedDocuments) {
         this.modifiedDocuments = modifiedDocuments;
     }
 
-    public void setDocumentRevisions(Set<DocumentRevision> documentRevisions) {
-        this.documentRevisions = documentRevisions;
+    public Set<DocumentRevision> getDocumentRevisions() {
+        return documentRevisions;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", passwordHash='" + passwordHash + '\'' +
-                ", isActive=" + isActive +
-                ", createdAt=" + createdAt +
-                ", modifiedAt=" + modifiedAt +
-                ", roles=" + roles +
-                ", uploadedFiles=" + uploadedFiles +
-                ", projectAssignments=" + projectAssignments +
-                ", modifiedDocuments=" + modifiedDocuments +
-                ", documentRevisions=" + documentRevisions +
-                '}';
+    public void setDocumentRevisions(Set<DocumentRevision> documentRevisions) {
+        this.documentRevisions = documentRevisions;
     }
 }
