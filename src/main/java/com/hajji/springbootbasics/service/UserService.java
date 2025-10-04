@@ -19,17 +19,19 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     // Get all users
     public List<UserResponseDTO> getAllUsers() {
-        return userRepository.findAll()
+       List<UserResponseDTO> allusers =  userRepository.findAll()
                 .stream()
                 .map(UserMapper::toResponseDTO)
                 .collect(Collectors.toList());
+
+
+       return allusers;
     }
 
     // Create a new user

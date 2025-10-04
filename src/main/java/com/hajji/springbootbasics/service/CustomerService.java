@@ -7,13 +7,20 @@ import com.hajji.springbootbasics.mapper.CustomerMapper;
 import com.hajji.springbootbasics.model.Customer;
 import com.hajji.springbootbasics.model.Project;
 import com.hajji.springbootbasics.repository.CustomerRepository;
+import com.hajji.springbootbasics.utility.PaginationLogger;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
@@ -36,13 +43,14 @@ public class CustomerService {
 
 
     @Transactional
-    public List<CustomerResponseDTO> getAllCustomers() {
-        List<Customer> customers = customerRepository.findAll();
-        return customers.stream()
+    public List<CustomerResponseDTO> getAllCustomers(int page , int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        PaginationLogger.logPageFetch("customers", pageable);
+        Page<Customer> customerPage = customerRepository.findAll(pageable);
+        return customerPage.stream()
                 .map(CustomerMapper::toDTO)
-                .toList();
+                .collect(Collectors.toList());
     }
-
 
 
     @Transactional

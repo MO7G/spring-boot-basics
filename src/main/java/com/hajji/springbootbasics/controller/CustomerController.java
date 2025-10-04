@@ -24,8 +24,11 @@ public class CustomerController {
 
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<CustomerResponseDTO>>> getAllCustomers() {
-        List<CustomerResponseDTO> customers = customerService.getAllCustomers();
+    public ResponseEntity<ApiResponse<List<CustomerResponseDTO>>> getAllCustomers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        List<CustomerResponseDTO> customers = customerService.getAllCustomers(page, size);
 
         ApiResponse<List<CustomerResponseDTO>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
@@ -35,6 +38,7 @@ public class CustomerController {
 
         return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("create")
     public ResponseEntity<ApiResponse<CustomerResponseDTO>> createCustomer(
