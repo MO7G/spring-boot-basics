@@ -45,4 +45,84 @@ public class StandardSection {
     private Set<StandardTemplate> templates = new HashSet<>();
 
     // Getters & Setters
+
+    public Integer getSectionId() {
+        return sectionId;
+    }
+
+    public void setSectionId(Integer sectionId) {
+        this.sectionId = sectionId;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Integer getOrderIndex() {
+        return orderIndex;
+    }
+
+    public void setOrderIndex(Integer orderIndex) {
+        this.orderIndex = orderIndex;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getModifiedAt() {
+        return modifiedAt;
+    }
+
+    public void setModifiedAt(LocalDateTime modifiedAt) {
+        this.modifiedAt = modifiedAt;
+    }
+
+    public Standard getStandard() {
+        return standard;
+    }
+
+    public void setStandard(Standard standard) {
+        this.standard = standard;
+    }
+
+    public StandardSection getParentSection() {
+        return parentSection;
+    }
+
+    public void setParentSection(StandardSection parentSection) {
+        this.parentSection = parentSection;
+    }
+
+    public Set<StandardSection> getChildSections() {
+        return childSections;
+    }
+
+    public void setChildSections(Set<StandardSection> childSections) {
+        this.childSections = childSections;
+    }
+
+    public Set<StandardTemplate> getTemplates() {
+        return templates;
+    }
+
+    public void setTemplates(Set<StandardTemplate> templates) {
+        this.templates = templates;
+    }
 }

@@ -37,7 +37,7 @@ public class Project {
 
     @ManyToOne
     @JoinColumn(name = "StatusID", nullable = false)
-    private StandardStatus status;
+    private ProjectStatus status;
 
     @OneToMany(mappedBy = "project")
     private Set<ProjectDocument> projectDocuments = new HashSet<>();
@@ -46,4 +46,84 @@ public class Project {
     private Set<ProjectAssignment> assignments = new HashSet<>();
 
     // Getters & Setters
+
+    public Integer getProjectId() {
+        return projectId;
+    }
+
+    public LocalDateTime getStartDate() {
+        return startDate;
+    }
+
+    public LocalDateTime getCompletionDate() {
+        return completionDate;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getModifiedAt() {
+        return modifiedAt;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public Standard getStandard() {
+        return standard;
+    }
+
+    public ProjectStatus getStatus() {
+        return status;
+    }
+
+    public Set<ProjectDocument> getProjectDocuments() {
+        return projectDocuments;
+    }
+
+    public Set<ProjectAssignment> getAssignments() {
+        return assignments;
+    }
+
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
+    }
+
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setCompletionDate(LocalDateTime completionDate) {
+        this.completionDate = completionDate;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setModifiedAt(LocalDateTime modifiedAt) {
+        this.modifiedAt = modifiedAt;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public void setStandard(Standard standard) {
+        this.standard = standard;
+    }
+
+    public void setStatus(ProjectStatus status) {
+        this.status = status;
+    }
+
+    public void setProjectDocuments(Set<ProjectDocument> projectDocuments) {
+        this.projectDocuments = projectDocuments;
+    }
+
+    public void setAssignments(Set<ProjectAssignment> assignments) {
+        this.assignments = assignments;
+    }
 }

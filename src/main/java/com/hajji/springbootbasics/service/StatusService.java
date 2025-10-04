@@ -1,4 +1,75 @@
 package com.hajji.springbootbasics.service;
 
+import com.hajji.springbootbasics.dto.status.*;
+import com.hajji.springbootbasics.exceptions.common.ResourceNotFoundException;
+import com.hajji.springbootbasics.mapper.StatusMapper;
+import com.hajji.springbootbasics.model.ProjectStatus;
+import com.hajji.springbootbasics.model.DocumentStatus;
+import com.hajji.springbootbasics.repository.ProjectStatusRepository;
+import com.hajji.springbootbasics.repository.DocumentStatusRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
 public class StatusService {
+
+    private final ProjectStatusRepository projectStatusRepository;
+    private final DocumentStatusRepository documentStatusRepository;
+
+    public StatusService(ProjectStatusRepository projectStatusRepository, DocumentStatusRepository documentStatusRepository) {
+        this.projectStatusRepository = projectStatusRepository;
+        this.documentStatusRepository = documentStatusRepository;
+    }
+
+    /* ==================== Standard Status ==================== */
+
+    @Transactional
+    public StandardStatusResponseDTO createStandardStatus(CreateStandardStatusRequestDTO dto) {
+        ProjectStatus status = StatusMapper.toEntity(dto);
+        status = projectStatusRepository.save(status);
+        return StatusMapper.toDTO(status);
+    }
+
+    @Transactional
+    public List<StandardStatusResponseDTO> getAllStandardStatuses() {
+        return projectStatusRepository.findAll().stream()
+                .map(StatusMapper::toDTO)
+                .toList();
+    }
+
+    /* ==================== Document Status ==================== */
+
+    @Transactional
+    public DocumentStatusResponseDTO createDocumentStatus(CreateDocumentStatusRequestDTO dto) {
+        DocumentStatus status = StatusMapper.toEntity(dto);
+        status = documentStatusRepository.save(status);
+        return StatusMapper.toDTO(status);
+    }
+
+    @Transactional
+    public List<DocumentStatusResponseDTO> getAllDocumentStatuses() {
+        return documentStatusRepository.findAll().stream()
+                .map(StatusMapper::toDTO)
+                .toList();
+    }
+
+    @Transactional
+    public ProjectStatus findProjectStatusByName(String statusName) {
+        ProjectStatus standardStatus = projectStatusRepository.findByStatusNameIgnoreCase(statusName).orElseThrow(
+               ()->  new ResourceNotFoundException("Project status not found with name " + statusName)
+       );
+       return standardStatus;
+    }
+
+
+    @Transactional
+    public DocumentStatus findDocumentStatusByName(String statusName) {
+        DocumentStatus documentStatus = documentStatusRepository.findByStatusNameIgnoreCase(statusName).orElseThrow(
+                ()->  new ResourceNotFoundException("Project status not found with name " + statusName)
+        );
+        return documentStatus;
+    }
+
 }

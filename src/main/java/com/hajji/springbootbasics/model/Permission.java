@@ -2,6 +2,9 @@ package com.hajji.springbootbasics.model;
 
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,10 +24,12 @@ public class Permission {
     @Column(name = "Description", length = 200)
     private String description;
 
-    @Column(name = "CreatedAt")
+    @Column(name = "CreatedAt" , insertable = false, updatable = false )
+    @Generated(value= GenerationTime.INSERT)
     private LocalDateTime createdAt;
 
-    @Column(name = "ModifiedAt")
+    @Column(name = "ModifiedAt" , insertable = false, updatable = false )
+    @Generated(value = GenerationTime.ALWAYS)
     private LocalDateTime modifiedAt;
 
     /* ------------ Relationships ------------ */
@@ -86,4 +91,5 @@ public class Permission {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
+
 }
