@@ -13,6 +13,6 @@ public class PaginationLogger {
         int start = page * size + 1;
         int end = start + size - 1;
 
-        log.info("Fetching {} from {} to {}", entityName, start, end);
+        log.info("fetching {} from {} to {}", entityName, start, end);
     }
 }

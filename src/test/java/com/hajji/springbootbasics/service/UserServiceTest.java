@@ -9,6 +9,10 @@ import com.hajji.springbootbasics.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -33,7 +37,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getAllUsers_shouldReturnMappedUsers() {
+    void getAllUsers_shouldReturnMappedUsers_withPagination() {
         // Arrange
         User user1 = new User();
         user1.setUserId(1);
@@ -45,17 +49,21 @@ class UserServiceTest {
         user2.setFirstName("Jane");
         user2.setLastName("Smith");
 
-        when(userRepository.findAll()).thenReturn(Arrays.asList(user1, user2));
+        Pageable pageable = PageRequest.of(0, 10); // default page and size
+        Page<User> userPage = new PageImpl<>(Arrays.asList(user1, user2), pageable, 2);
+
+        when(userRepository.findAll(pageable)).thenReturn(userPage);
 
         // Act
-        List<UserResponseDTO> result = userService.getAllUsers();
+        List<UserResponseDTO> result = userService.getAllUsers(0, 10);
 
         // Assert
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getFirstName()).isEqualTo("John");
         assertThat(result.get(1).getFirstName()).isEqualTo("Jane");
-        verify(userRepository, times(1)).findAll();
+        verify(userRepository, times(1)).findAll(pageable);
     }
+
 
     @Test
     void createUser_shouldSaveAndReturnResponseDTO() {

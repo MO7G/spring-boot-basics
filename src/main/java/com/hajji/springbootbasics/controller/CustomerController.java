@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-
 import java.util.List;
 
 @RestController
@@ -22,18 +21,13 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-
+    // Fetch customers with pagination
     @GetMapping("/all")
-<<<<<<< HEAD
     public ResponseEntity<ApiResponse<List<CustomerResponseDTO>>> getAllCustomers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
         List<CustomerResponseDTO> customers = customerService.getAllCustomers(page, size);
-=======
-    public ResponseEntity<ApiResponse<List<CustomerResponseDTO>>> getAllCustomers() {
-        List<CustomerResponseDTO> customers = customerService.getAllCustomers();
->>>>>>> 637e1fb2e48e5bc37715b4033bf3615469a047ca
 
         ApiResponse<List<CustomerResponseDTO>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
@@ -44,11 +38,8 @@ public class CustomerController {
         return ResponseEntity.ok(response);
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 637e1fb2e48e5bc37715b4033bf3615469a047ca
-    @PostMapping("create")
+    // Create a new customer
+    @PostMapping("/create")
     public ResponseEntity<ApiResponse<CustomerResponseDTO>> createCustomer(
             @Valid @RequestBody CreateCustomerRequestDTO requestDTO) {
 
@@ -63,8 +54,8 @@ public class CustomerController {
         return ResponseEntity.ok(response);
     }
 
-
-    @DeleteMapping("delete/{customerId}")
+    // Delete a customer
+    @DeleteMapping("/delete/{customerId}")
     public ResponseEntity<ApiResponse<String>> deleteCustomer(
             @PathVariable Integer customerId,
             @RequestParam(defaultValue = "false") boolean forceDelete) {

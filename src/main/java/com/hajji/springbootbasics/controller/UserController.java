@@ -25,8 +25,11 @@ public class UserController {
 
     // ✅ Get All Users
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<UserResponseDTO>>> getAllUsers() {
-        List<UserResponseDTO> users = userService.getAllUsers();
+    public ResponseEntity<ApiResponse<List<UserResponseDTO>>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        List<UserResponseDTO> users = userService.getAllUsers(page, size);
         ApiResponse<List<UserResponseDTO>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "Users fetched successfully",
@@ -34,6 +37,7 @@ public class UserController {
         );
         return ResponseEntity.ok(response);
     }
+
 
     // ✅ Create User
     @PostMapping("/create")
@@ -48,18 +52,20 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // ✅ Update User
-//    @PutMapping("/update")
-//    public ResponseEntity<ApiResponse<UserResponseDTO>> updateUser(
-//            @Validated(UpdateUser.class) @RequestBody UpdateUserRequestDTO updateUserRequestDTO) {
-//        UserResponseDTO updatedUser = userService.updateUser(updateUserRequestDTO);
-//        ApiResponse<UserResponseDTO> response = new ApiResponse<>(
-//                HttpStatus.OK.value(),
-//                "User updated successfully",
-//                updatedUser
-//        );
-//        return ResponseEntity.ok(response);
-//    }
+    @PatchMapping("/applyGeneralUpdates")
+    public ResponseEntity<ApiResponse<UserResponseDTO>> applyGeneralUpdates(
+           @Valid @RequestBody UpdateUserRequestDTO updateUserRequestDTO) {
+
+        UserResponseDTO updatedUser = userService.applyGeneralUpdates(updateUserRequestDTO);
+
+        ApiResponse<UserResponseDTO> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "User updated successfully",
+                updatedUser
+        );
+
+        return ResponseEntity.ok(response);
+    }
 
     // ✅ Delete User
     @DeleteMapping("/delete/{id}")

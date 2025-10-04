@@ -9,18 +9,17 @@ public class UserMapper {
 
 
     // DTO → Entity
-    public static User toEntity(UpdateUserRequestDTO dto) {
-        if (dto == null) return null;
-        User user = new User();
-        user.setUserId(dto.getUserId());
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setEmail(dto.getEmail());
-        user.setActive(dto.getActive());
-        user.setCreatedAt(dto.getCreatedAt());
-        user.setModifiedAt(dto.getModifiedAt());
-        return user;
+    // Update User DTO → Entity (PatchField aware)
+    public static void updateEntity(User user, UpdateUserRequestDTO dto) {
+        if (user == null || dto == null) return;
+
+        // using method reference instead of lambdas because its more boilerplate code !!
+        dto.getFirstName().ifProvided(user::setFirstName); //  same as this -> dto.getFirstName().ifProvided(value -> user.setFirstName(value));
+        dto.getLastName().ifProvided(user::setLastName);
+        dto.getIsActive().ifProvided(user::setActive);
+        user.setModifiedAt(java.time.LocalDateTime.now());
     }
+
 
     public static User toEntity(CreateUserRequestDTO dto) {
         if (dto == null) return null;
