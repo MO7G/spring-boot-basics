@@ -1,21 +1,20 @@
 services:
-  postgres:
-    image: postgres:15
-    container_name: spring-boot-basic-postgres-db
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: spring-boot-basic-sqlserver-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: hajji
-      POSTGRES_PASSWORD: hajji123
-      POSTGRES_DB: springbootdb
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Passwor@1"
     ports:
-      - "5433:5432"
+      - "1433:1433"
     volumes:
-      - spring_boot_basic_postgres_data:/var/lib/postgresql/data
+      - spring_boot_basic_sqlserver_data:/var/opt/mssql
     networks:
       - spring_boot_basic_network
 
 volumes:
-  spring_boot_basic_postgres_data:
+  spring_boot_basic_sqlserver_data:
 
 networks:
   spring_boot_basic_network:

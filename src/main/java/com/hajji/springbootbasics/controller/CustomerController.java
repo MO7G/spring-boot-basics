@@ -2,7 +2,7 @@ package com.hajji.springbootbasics.controller;
 
 import com.hajji.springbootbasics.dto.customer.CreateCustomerRequestDTO;
 import com.hajji.springbootbasics.dto.customer.CustomerResponseDTO;
-import com.hajji.springbootbasics.dto.response.ApiResponse;
+import com.hajji.springbootbasics.dto.response.ApiResponseWrapper;
 import com.hajji.springbootbasics.service.CustomerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +23,13 @@ public class CustomerController {
 
     // Fetch customers with pagination
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<CustomerResponseDTO>>> getAllCustomers(
+    public ResponseEntity<ApiResponseWrapper<List<CustomerResponseDTO>>> getAllCustomers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
         List<CustomerResponseDTO> customers = customerService.getAllCustomers(page, size);
 
-        ApiResponse<List<CustomerResponseDTO>> response = new ApiResponse<>(
+        ApiResponseWrapper<List<CustomerResponseDTO>> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Customers fetched successfully",
                 customers
@@ -40,12 +40,12 @@ public class CustomerController {
 
     // Create a new customer
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<CustomerResponseDTO>> createCustomer(
+    public ResponseEntity<ApiResponseWrapper<CustomerResponseDTO>> createCustomer(
             @Valid @RequestBody CreateCustomerRequestDTO requestDTO) {
 
         CustomerResponseDTO customer = customerService.createCustomer(requestDTO);
 
-        ApiResponse<CustomerResponseDTO> response = new ApiResponse<>(
+        ApiResponseWrapper<CustomerResponseDTO> response = new ApiResponseWrapper<>(
                 HttpStatus.CREATED.value(),
                 "Customer created successfully",
                 customer
@@ -56,13 +56,13 @@ public class CustomerController {
 
     // Delete a customer
     @DeleteMapping("/delete/{customerId}")
-    public ResponseEntity<ApiResponse<String>> deleteCustomer(
+    public ResponseEntity<ApiResponseWrapper<String>> deleteCustomer(
             @PathVariable Integer customerId,
             @RequestParam(defaultValue = "false") boolean forceDelete) {
 
         customerService.deleteCustomer(customerId, forceDelete);
 
-        ApiResponse<String> response = new ApiResponse<>(
+        ApiResponseWrapper<String> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Customer deleted successfully",
                 "Customer ID: " + customerId

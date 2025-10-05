@@ -10,7 +10,9 @@ import com.hajji.springbootbasics.model.*;
 import com.hajji.springbootbasics.repository.StandardRepository;
 import com.hajji.springbootbasics.repository.StandardSectionRepository;
 import com.hajji.springbootbasics.repository.StandardTemplateRepository;
+import com.hajji.springbootbasics.utility.PaginationLogger;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,14 +55,44 @@ public class StandardService {
         Standard standard = StandardMapper.toEntity(dto);
         standard = standardRepository.save(standard);
 
-        return StandardMapper.toDTO(standard);
+        return StandardMapper.toResponseDTO(standard);
     }
 
+
+
     @Transactional
-    public List<StandardResponseDTO> getAllStandards() {
-        return standardRepository.findAll()
+    public StandardResponseDTO updateStandard(UpdateStandardRequestDTO dto) {
+        if (!dto.getStandardId().isProvided()) {
+            throw new IllegalArgumentException("Standard ID is required for update");
+        }
+
+        Standard standard = standardRepository.findById(dto.getStandardId().get())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Standard not found with ID " + dto.getStandardId().get()
+                ));
+
+        // Patch updates using ifProvided
+        dto.getName().ifProvided(standard::setName);
+        dto.getVersion().ifProvided(standard::setVersion);
+
+        // Update modification timestamp
+        standard.setModifiedAt(LocalDateTime.now());
+
+        Standard updated = standardRepository.save(standard);
+        return StandardMapper.toResponseDTO(updated);  // assuming you have a mapper similar to UserMapper
+    }
+
+
+    @Transactional
+    public List<StandardResponseDTO> getAllStandards(Pageable pageable) {
+
+        // Log page fetch
+        PaginationLogger.logPageFetch("Standards", pageable);
+
+        // Fetch all standards
+        return standardRepository.findAll(pageable) // <-- using pageable
                 .stream()
-                .map(StandardMapper::toDTO)
+                .map(StandardMapper::toResponseDTO)
                 .toList();
     }
 
@@ -69,7 +101,7 @@ public class StandardService {
         Standard standard = standardRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Standard not found with ID: " + id));
 
-        return StandardMapper.toDTO(standard);
+        return StandardMapper.toResponseDTO(standard);
     }
 
     @Transactional

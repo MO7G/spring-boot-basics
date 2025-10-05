@@ -1,7 +1,7 @@
 package com.hajji.springbootbasics.controller;
 
 import com.hajji.springbootbasics.dto.file.FileStorageResponseDTO;
-import com.hajji.springbootbasics.dto.response.ApiResponse;
+import com.hajji.springbootbasics.dto.response.ApiResponseWrapper;
 import com.hajji.springbootbasics.service.FileStorageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +19,12 @@ public class FileStorageController {
     }
 
     @PostMapping("templateUpload/upload")
-    public ResponseEntity<ApiResponse<FileStorageResponseDTO>> uploadFile(
+    public ResponseEntity<ApiResponseWrapper<FileStorageResponseDTO>> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("userId") Integer userId) {
 
         FileStorageResponseDTO response = fileStorageService.uploadFile(file, userId, null);
-        ApiResponse apiResponse = new ApiResponse(
+        ApiResponseWrapper apiResponse = new ApiResponseWrapper(
                 HttpStatus.OK.value(),
                 "Uploaded File Successfuly",
                 response

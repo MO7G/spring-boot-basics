@@ -1,6 +1,6 @@
 package com.hajji.springbootbasics.controller;
 
-import com.hajji.springbootbasics.dto.response.ApiResponse;
+import com.hajji.springbootbasics.dto.response.ApiResponseWrapper;
 import com.hajji.springbootbasics.dto.role.CreateRoleDTO;
 import com.hajji.springbootbasics.dto.role.RolePermissionRequestDTO;
 import com.hajji.springbootbasics.dto.role.RoleResponseDTO;
@@ -24,10 +24,10 @@ public class RoleController {
     // ✅ Get All Roles
 
     @GetMapping("all")
-    public ResponseEntity<ApiResponse<List<RoleResponseDTO>>> getAllRoles() {
+    public ResponseEntity<ApiResponseWrapper<List<RoleResponseDTO>>> getAllRoles() {
         List<RoleResponseDTO> roles = roleService.getAllRoles();
 
-        ApiResponse<List<RoleResponseDTO>> response = new ApiResponse<>(
+        ApiResponseWrapper<List<RoleResponseDTO>> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Roles fetched successfully",
                 roles
@@ -39,10 +39,10 @@ public class RoleController {
 
 
     @PostMapping("create")
-    public ResponseEntity<ApiResponse<RoleResponseDTO>> createRole(@Valid @RequestBody CreateRoleDTO createRoleDTO) {
+    public ResponseEntity<ApiResponseWrapper<RoleResponseDTO>> createRole(@Valid @RequestBody CreateRoleDTO createRoleDTO) {
         RoleResponseDTO role = roleService.createRole(createRoleDTO);
 
-        ApiResponse<RoleResponseDTO> response = new ApiResponse<>(
+        ApiResponseWrapper<RoleResponseDTO> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Created Role successfully",
                 role
@@ -53,12 +53,12 @@ public class RoleController {
 
 
     @PostMapping("/addPermission")
-    public ResponseEntity<ApiResponse<RoleResponseDTO>> addPermissionToRole(
+    public ResponseEntity<ApiResponseWrapper<RoleResponseDTO>> addPermissionToRole(
             @Valid @RequestBody RolePermissionRequestDTO rolePermissionRequestDTO) {
 
         RoleResponseDTO updatedRole = roleService.addPermission(rolePermissionRequestDTO);
 
-        ApiResponse<RoleResponseDTO> response = new ApiResponse<>(
+        ApiResponseWrapper<RoleResponseDTO> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Permission added to role successfully",
                 updatedRole
@@ -71,12 +71,12 @@ public class RoleController {
 
 
     @DeleteMapping("/unassignPermission")
-    public ResponseEntity<ApiResponse<RoleResponseDTO>> unassignPermissionFromRole(
+    public ResponseEntity<ApiResponseWrapper<RoleResponseDTO>> unassignPermissionFromRole(
             @Valid @RequestBody RolePermissionRequestDTO rolePermissionRequestDTO) {
 
         RoleResponseDTO updatedRole = roleService.unassignPermission(rolePermissionRequestDTO);
 
-        ApiResponse<RoleResponseDTO> response = new ApiResponse<>(
+        ApiResponseWrapper<RoleResponseDTO> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Permission removed from role successfully",
                 updatedRole

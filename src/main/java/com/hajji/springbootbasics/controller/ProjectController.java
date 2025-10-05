@@ -3,7 +3,7 @@ package com.hajji.springbootbasics.controller;
 import com.hajji.springbootbasics.dto.project.AssignUserToProjectRequestDTO;
 import com.hajji.springbootbasics.dto.project.CreateProjectRequestDTO;
 import com.hajji.springbootbasics.dto.project.ProjectResponseDTO;
-import com.hajji.springbootbasics.dto.response.ApiResponse;
+import com.hajji.springbootbasics.dto.response.ApiResponseWrapper;
 import com.hajji.springbootbasics.model.ProjectDocument;
 import com.hajji.springbootbasics.service.ProjectService;
 import jakarta.validation.Valid;
@@ -23,12 +23,12 @@ public class ProjectController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<ApiResponse<ProjectResponseDTO>> createProject(
+    public ResponseEntity<ApiResponseWrapper<ProjectResponseDTO>> createProject(
             @Valid @RequestBody CreateProjectRequestDTO dto) {
 
         ProjectResponseDTO project = projectService.createProject(dto);
 
-        ApiResponse<ProjectResponseDTO> response = new ApiResponse<>(
+        ApiResponseWrapper<ProjectResponseDTO> response = new ApiResponseWrapper<>(
                 200,
                 "Project created successfully",
                 project
@@ -39,7 +39,7 @@ public class ProjectController {
 
 
     @PostMapping("/assign")
-    public ResponseEntity<ApiResponse<String>> assignUserToProject(
+    public ResponseEntity<ApiResponseWrapper<String>> assignUserToProject(
             @Valid @RequestBody AssignUserToProjectRequestDTO request) {
 
         projectService.assignUserWithRole(
@@ -48,18 +48,18 @@ public class ProjectController {
                 request.getRoleId()
         );
 
-        ApiResponse<String> apiResponse = new ApiResponse<>(200, "User assigned with role successfully");
+        ApiResponseWrapper<String> apiResponse = new ApiResponseWrapper<>(200, "User assigned with role successfully");
 
         return ResponseEntity.ok(apiResponse);
     }
 
     @DeleteMapping("delete/{projectId}")
-    public ResponseEntity<ApiResponse<String>> deleteProject(
+    public ResponseEntity<ApiResponseWrapper<String>> deleteProject(
             @PathVariable Integer projectId) {
 
         projectService.deleteProject(projectId);
 
-        ApiResponse<String> response = new ApiResponse<>(
+        ApiResponseWrapper<String> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Project deleted successfully"
         );
@@ -69,7 +69,7 @@ public class ProjectController {
 
 
     @PostMapping("/{projectId}/documents/{projectDocumentId}/upload")
-    public ResponseEntity<ApiResponse<String>> uploadNewVersion(
+    public ResponseEntity<ApiResponseWrapper<String>> uploadNewVersion(
             @PathVariable int projectId,
             @PathVariable int projectDocumentId,
             @RequestParam("file") MultipartFile file,
@@ -79,7 +79,7 @@ public class ProjectController {
         projectService.uploadNewVersion(projectId, projectDocumentId, file, customerId, changeNote);
 
         return ResponseEntity.ok(
-                new ApiResponse<>(200, "File uploaded and revision recorded successfully.")
+                new ApiResponseWrapper<>(200, "File uploaded and revision recorded successfully.")
         );
     }
 

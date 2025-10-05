@@ -1,6 +1,6 @@
 package com.hajji.springbootbasics.controller;
 
-import com.hajji.springbootbasics.dto.response.ApiResponse;
+import com.hajji.springbootbasics.dto.response.ApiResponseWrapper;
 import com.hajji.springbootbasics.dto.user.CreateUserRequestDTO;
 import com.hajji.springbootbasics.dto.user.UpdateUserRequestDTO;
 import com.hajji.springbootbasics.dto.user.UserResponseDTO;
@@ -25,12 +25,12 @@ public class UserController {
 
     // ✅ Get All Users
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<UserResponseDTO>>> getAllUsers(
+    public ResponseEntity<ApiResponseWrapper<List<UserResponseDTO>>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         List<UserResponseDTO> users = userService.getAllUsers(page, size);
-        ApiResponse<List<UserResponseDTO>> response = new ApiResponse<>(
+        ApiResponseWrapper<List<UserResponseDTO>> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Users fetched successfully",
                 users
@@ -41,10 +41,10 @@ public class UserController {
 
     // ✅ Create User
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<UserResponseDTO>> createUser(
+    public ResponseEntity<ApiResponseWrapper<UserResponseDTO>> createUser(
             @Valid @RequestBody CreateUserRequestDTO createUserRequestDTO) {
         UserResponseDTO createdUser = userService.createUser(createUserRequestDTO);
-        ApiResponse<UserResponseDTO> response = new ApiResponse<>(
+        ApiResponseWrapper<UserResponseDTO> response = new ApiResponseWrapper<>(
                 HttpStatus.CREATED.value(),
                 "User created successfully",
                 createdUser
@@ -53,12 +53,12 @@ public class UserController {
     }
 
     @PatchMapping("/applyGeneralUpdates")
-    public ResponseEntity<ApiResponse<UserResponseDTO>> applyGeneralUpdates(
+    public ResponseEntity<ApiResponseWrapper<UserResponseDTO>> applyGeneralUpdates(
            @Valid @RequestBody UpdateUserRequestDTO updateUserRequestDTO) {
 
         UserResponseDTO updatedUser = userService.applyGeneralUpdates(updateUserRequestDTO);
 
-        ApiResponse<UserResponseDTO> response = new ApiResponse<>(
+        ApiResponseWrapper<UserResponseDTO> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "User updated successfully",
                 updatedUser
@@ -69,9 +69,9 @@ public class UserController {
 
     // ✅ Delete User
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponseWrapper<Void>> deleteUser(@PathVariable Integer id) {
         userService.deleteUser(id);
-        ApiResponse<Void> response = new ApiResponse<>(
+        ApiResponseWrapper<Void> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "User deleted successfully",
                 null

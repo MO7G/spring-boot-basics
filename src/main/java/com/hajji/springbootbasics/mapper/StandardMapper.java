@@ -23,7 +23,7 @@ public class StandardMapper {
         return standard;
     }
 
-    public static StandardResponseDTO toDTO(Standard standard) {
+    public static StandardResponseDTO toResponseDTO(Standard standard) {
         StandardResponseDTO dto = new StandardResponseDTO();
         dto.setStandardId(standard.getStandardId());
         dto.setName(standard.getName());

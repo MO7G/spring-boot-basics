@@ -1,19 +1,34 @@
 package com.hajji.springbootbasics.controller;
 
 import com.hajji.springbootbasics.dto.file.FileStorageResponseDTO;
-import com.hajji.springbootbasics.dto.response.ApiResponse;
+import com.hajji.springbootbasics.dto.response.ApiResponseWrapper;
 import com.hajji.springbootbasics.dto.standard.*;
 import com.hajji.springbootbasics.service.StandardService;
+import com.hajji.springbootbasics.utility.PaginationLogger;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.server.ResponseStatusException;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/standard/")
+@RequestMapping("/api/standard")
+@Tag(name = "Standards", description = "Endpoints for managing ISO standards, sections, and file uploads")
 public class StandardController {
 
     private final StandardService standardService;
@@ -24,124 +39,183 @@ public class StandardController {
 
     /* ---------------- STANDARD CRUD ---------------- */
 
-    @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<StandardResponseDTO>>> getAllStandards() {
-        List<StandardResponseDTO> standards = standardService.getAllStandards();
 
-        ApiResponse<List<StandardResponseDTO>> response = new ApiResponse<>(
+    // Fetch Standards with Pagination
+    @Operation(
+            summary = "Get all standards with pagination",
+            description = "Retrieves a paginated list of all ISO standards. Default page=0, size=20."
+    )
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponseWrapper<List<StandardResponseDTO>>> getAllStandards(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        PaginationLogger.logPageFetch("Standards", pageable);
+
+        List<StandardResponseDTO> standards = standardService.getAllStandards(pageable);
+
+        return ResponseEntity.ok(new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Standards fetched successfully",
                 standards
-        );
-
-        return ResponseEntity.ok(response);
+        ));
     }
 
-    @PostMapping("create")
-    public ResponseEntity<ApiResponse<StandardResponseDTO>> createStandard(
+
+
+    // Create a Standard
+    @Operation(
+            summary = "Create a new standard",
+            description = "Creates a new ISO standard using the provided details."
+    )
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponseWrapper<StandardResponseDTO>> createStandard(
             @Valid @RequestBody CreateStandardRequestDTO requestDTO) {
 
         StandardResponseDTO standard = standardService.createStandard(requestDTO);
 
-        ApiResponse<StandardResponseDTO> response = new ApiResponse<>(
+        return ResponseEntity.ok(new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Standard created successfully",
                 standard
-        );
-
-        return ResponseEntity.ok(response);
+        ));
     }
 
-    @DeleteMapping("delete/{standardId}")
-    public ResponseEntity<ApiResponse<String>> deleteStandard(@PathVariable Integer standardId) {
+
+    // Update Standard
+    @Operation(
+            summary = "Update a standard",
+            description = "Update an ISO standard using the provided details."
+    )
+    @PatchMapping("/update")
+    public ResponseEntity<ApiResponseWrapper<StandardResponseDTO>> updateStandard(
+            @Valid @RequestBody UpdateStandardRequestDTO requestDTO) {
+
+        StandardResponseDTO standard = standardService.updateStandard(requestDTO);
+
+        return ResponseEntity.ok(new ApiResponseWrapper<>(
+                HttpStatus.OK.value(),
+                "Standard updated successfully",
+                standard
+        ));
+    }
+
+
+    // Delete A Standard
+    @Operation(
+            summary = "Delete a standard",
+            description = "Deletes an existing ISO standard by its ID."
+    )
+    @DeleteMapping("/delete/{standardId}")
+    public ResponseEntity<ApiResponseWrapper<String>> deleteStandard(
+            @Parameter(description = "ID of the standard to delete") @PathVariable Integer standardId) {
+
         standardService.deleteStandard(standardId);
 
-        ApiResponse<String> response = new ApiResponse<>(
+        return ResponseEntity.ok(new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Standard deleted successfully",
                 "Standard ID: " + standardId
-        );
-
-        return ResponseEntity.ok(response);
+        ));
     }
 
-    /* ---------------- SECTION CREATE ---------------- */
+    /* ---------------- SECTION CRUD ---------------- */
 
-    @PostMapping("{standardId}/sections/create")
-    public ResponseEntity<ApiResponse<StandardSectionResponseDTO>> createSection(
-            @PathVariable Integer standardId,
+
+    // Create Sections
+    @Operation(
+            summary = "Create a section under a standard",
+            description = "Adds a new section to a specific ISO standard identified by its ID."
+    )
+    @PostMapping("/{standardId}/sections/create")
+    public ResponseEntity<ApiResponseWrapper<StandardSectionResponseDTO>> createSection(
+            @Parameter(description = "ID of the parent standard") @PathVariable Integer standardId,
             @Valid @RequestBody CreateStandardSectionRequestDTO dto) {
 
-        dto.setStandardId(standardId); // enforce standard from URL
+        dto.setStandardId(standardId);
         StandardSectionResponseDTO section = standardService.createSection(dto);
 
-        ApiResponse<StandardSectionResponseDTO> response = new ApiResponse<>(
+        return ResponseEntity.ok(new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Standard section created successfully",
                 section
-        );
-
-        return ResponseEntity.ok(response);
+        ));
     }
 
 
-
-    @GetMapping("{standardId}/treeView")
-    public ResponseEntity<ApiResponse<StandardSectionTreeDTO>> getStandardSectionTree(
-            @PathVariable Integer standardId) {
+    //
+    @Operation(
+            summary = "Get standard section tree",
+            description = "Fetches the hierarchical tree of all sections for a given standard."
+    )
+    @GetMapping("/{standardId}/treeView")
+    public ResponseEntity<ApiResponseWrapper<StandardSectionTreeDTO>> getStandardSectionTree(
+            @Parameter(description = "ID of the standard") @PathVariable Integer standardId) {
 
         StandardSectionTreeDTO tree = standardService.getStandardSectionTree(standardId);
 
-        ApiResponse<StandardSectionTreeDTO> response = new ApiResponse<>(
+        return ResponseEntity.ok(new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
-                "Standard Tree Fetched successfully",
+                "Standard tree fetched successfully",
                 tree
-        );
-
-        return ResponseEntity.ok(response);
+        ));
     }
 
 
 
-    /*--------------File upload here --------------------*/
-    @PostMapping("{standardId}/sections/{sectionId}/upload")
-    public ResponseEntity<ApiResponse<FileStorageResponseDTO>> uploadFileToSection(
-            @PathVariable Integer standardId,
-            @PathVariable Integer sectionId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("userId") Integer userId) {
 
-        // Delegate to service
-        FileStorageResponseDTO uploaded = standardService.uploadFileToSection(file , userId, sectionId);
 
-        ApiResponse<FileStorageResponseDTO> response = new ApiResponse<>(
+
+
+
+
+
+    /* ----------------Section FILE UPLOAD ---------------- */
+
+    @Operation(
+            summary = "Upload a file to a section",
+            description = "Uploads a single PDF file to the specified section. Multiple files per request are not allowed."
+    )
+    @PostMapping("/{standardId}/sections/{sectionId}/upload")
+    public ResponseEntity<ApiResponseWrapper<FileStorageResponseDTO>> uploadFileToSection(
+            @Parameter(description = "ID of the standard") @PathVariable Integer standardId,
+            @Parameter(description = "ID of the section") @PathVariable Integer sectionId,
+            @Parameter(description = "File to upload (PDF only)") @RequestParam("file") MultipartFile file,
+            @Parameter(description = "User ID of the uploader") @RequestParam("userId") Integer userId,
+            HttpServletRequest request) {
+
+        if (request instanceof MultipartHttpServletRequest multipartRequest &&
+                multipartRequest.getMultiFileMap().get("file").size() > 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Multiple files are not allowed. Upload only one file at a time.");
+        }
+
+        FileStorageResponseDTO uploaded = standardService.uploadFileToSection(file, userId, sectionId);
+
+        return ResponseEntity.ok(new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "File uploaded successfully",
                 uploaded
-        );
-
-        return ResponseEntity.ok(response);
+        ));
     }
 
+    @Operation(
+            summary = "Delete a file from a section",
+            description = "Removes a specific file by ID from the given section."
+    )
+    @DeleteMapping("/{standardId}/sections/{sectionId}/files/{fileId}")
+    public ResponseEntity<ApiResponseWrapper<String>> deleteFileFromSection(
+            @Parameter(description = "Standard ID") @PathVariable Integer standardId,
+            @Parameter(description = "Section ID") @PathVariable Integer sectionId,
+            @Parameter(description = "File ID to delete") @PathVariable Integer fileId) {
 
-
-    @DeleteMapping("{standardId}/sections/{sectionId}/files/{fileId}")
-    public ResponseEntity<ApiResponse<String>> deleteFileFromSection(
-            @PathVariable Integer standardId,
-            @PathVariable Integer sectionId,
-            @PathVariable Integer fileId
-    ) {
         standardService.removeFileFromSection(fileId, sectionId);
 
-        ApiResponse<String> response = new ApiResponse<>(
+        return ResponseEntity.ok(new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "File removed successfully",
                 "File ID: " + fileId + " from Section ID: " + sectionId
-        );
-
-        return ResponseEntity.ok(response);
+        ));
     }
-
-
-
 }

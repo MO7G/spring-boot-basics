@@ -2,7 +2,7 @@ package com.hajji.springbootbasics.controller;
 
 import com.hajji.springbootbasics.dto.permission.CreatePermissionRequestDTO;
 import com.hajji.springbootbasics.dto.permission.PermissionResponseDTO;
-import com.hajji.springbootbasics.dto.response.ApiResponse;
+import com.hajji.springbootbasics.dto.response.ApiResponseWrapper;
 import com.hajji.springbootbasics.model.Permission;
 import com.hajji.springbootbasics.service.PermissionService;
 import jakarta.validation.Valid;
@@ -21,9 +21,9 @@ public class PermissionController {
     }
 
     @GetMapping("all")
-    public ResponseEntity<ApiResponse<List<Permission>>> getAllPermission(){
+    public ResponseEntity<ApiResponseWrapper<List<Permission>>> getAllPermission(){
         List<PermissionResponseDTO> permissions = permissionService.getAllPermission();
-        ApiResponse<List<Permission>> apiResponse = new  ApiResponse(
+        ApiResponseWrapper<List<Permission>> apiResponse = new  ApiResponseWrapper(
                 HttpStatus.OK.value(),
                 "Fetched All Permission Successfully",
                 permissions
@@ -34,9 +34,9 @@ public class PermissionController {
 
 
     @PostMapping("create")
-    public ResponseEntity<ApiResponse<PermissionResponseDTO>> createPermission(@Valid @RequestBody CreatePermissionRequestDTO createPermissionRequestDTO){
+    public ResponseEntity<ApiResponseWrapper<PermissionResponseDTO>> createPermission(@Valid @RequestBody CreatePermissionRequestDTO createPermissionRequestDTO){
         PermissionResponseDTO permissionResponseDTO  = permissionService.createPermission(createPermissionRequestDTO);
-        ApiResponse<PermissionResponseDTO> apiResponse = new  ApiResponse(
+        ApiResponseWrapper<PermissionResponseDTO> apiResponse = new  ApiResponseWrapper(
                 HttpStatus.OK.value(),
                 "Created Permission Successfully",
                 permissionResponseDTO
@@ -47,9 +47,9 @@ public class PermissionController {
 
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<ApiResponse<PermissionResponseDTO>> deletePermission(@PathVariable("id") Integer id){
+    public ResponseEntity<ApiResponseWrapper<PermissionResponseDTO>> deletePermission(@PathVariable("id") Integer id){
         permissionService.deletePermission(id,true);
-        ApiResponse<PermissionResponseDTO> apiResponse = new  ApiResponse(
+        ApiResponseWrapper<PermissionResponseDTO> apiResponse = new  ApiResponseWrapper(
                 HttpStatus.OK.value(),
                 "Deleted Permission Successfully",
                 null

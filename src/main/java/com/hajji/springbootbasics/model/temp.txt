@@ -928,7 +928,7 @@ GO
 package com.hajji.springbootbasics.controller;
 
 import com.hajji.springbootbasics.dto.file.FileStorageResponseDTO;
-import com.hajji.springbootbasics.dto.response.ApiResponse;
+import com.hajji.springbootbasics.dto.response.ApiResponseWrapper;
 import com.hajji.springbootbasics.dto.standard.*;
 import com.hajji.springbootbasics.service.StandardService;
 import jakarta.validation.Valid;
@@ -952,10 +952,10 @@ public class StandardController {
     /* ---------------- STANDARD CRUD ---------------- */
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<StandardResponseDTO>>> getAllStandards() {
+    public ResponseEntity<ApiResponseWrapper<List<StandardResponseDTO>>> getAllStandards() {
         List<StandardResponseDTO> standards = standardService.getAllStandards();
 
-        ApiResponse<List<StandardResponseDTO>> response = new ApiResponse<>(
+        ApiResponseWrapper<List<StandardResponseDTO>> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Standards fetched successfully",
                 standards
@@ -965,12 +965,12 @@ public class StandardController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<ApiResponse<StandardResponseDTO>> createStandard(
+    public ResponseEntity<ApiResponseWrapper<StandardResponseDTO>> createStandard(
             @Valid @RequestBody CreateStandardRequestDTO requestDTO) {
 
         StandardResponseDTO standard = standardService.createStandard(requestDTO);
 
-        ApiResponse<StandardResponseDTO> response = new ApiResponse<>(
+        ApiResponseWrapper<StandardResponseDTO> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Standard created successfully",
                 standard
@@ -980,10 +980,10 @@ public class StandardController {
     }
 
     @DeleteMapping("delete/{standardId}")
-    public ResponseEntity<ApiResponse<String>> deleteStandard(@PathVariable Integer standardId) {
+    public ResponseEntity<ApiResponseWrapper<String>> deleteStandard(@PathVariable Integer standardId) {
         standardService.deleteStandard(standardId);
 
-        ApiResponse<String> response = new ApiResponse<>(
+        ApiResponseWrapper<String> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Standard deleted successfully",
                 "Standard ID: " + standardId
@@ -995,14 +995,14 @@ public class StandardController {
     /* ---------------- SECTION CREATE ---------------- */
 
     @PostMapping("{standardId}/sections/create")
-    public ResponseEntity<ApiResponse<StandardSectionResponseDTO>> createSection(
+    public ResponseEntity<ApiResponseWrapper<StandardSectionResponseDTO>> createSection(
             @PathVariable Integer standardId,
             @Valid @RequestBody CreateStandardSectionRequestDTO dto) {
 
         dto.setStandardId(standardId); // enforce standard from URL
         StandardSectionResponseDTO section = standardService.createSection(dto);
 
-        ApiResponse<StandardSectionResponseDTO> response = new ApiResponse<>(
+        ApiResponseWrapper<StandardSectionResponseDTO> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Standard section created successfully",
                 section
@@ -1014,12 +1014,12 @@ public class StandardController {
 
 
     @GetMapping("{standardId}/treeView")
-    public ResponseEntity<ApiResponse<StandardSectionTreeDTO>> getStandardSectionTree(
+    public ResponseEntity<ApiResponseWrapper<StandardSectionTreeDTO>> getStandardSectionTree(
             @PathVariable Integer standardId) {
 
         StandardSectionTreeDTO tree = standardService.getStandardSectionTree(standardId);
 
-        ApiResponse<StandardSectionTreeDTO> response = new ApiResponse<>(
+        ApiResponseWrapper<StandardSectionTreeDTO> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "Standard Tree Fetched successfully",
                 tree
@@ -1032,7 +1032,7 @@ public class StandardController {
 
     /*--------------File upload here --------------------*/
     @PostMapping("{standardId}/sections/{sectionId}/upload")
-    public ResponseEntity<ApiResponse<FileStorageResponseDTO>> uploadFileToSection(
+    public ResponseEntity<ApiResponseWrapper<FileStorageResponseDTO>> uploadFileToSection(
             @PathVariable Integer standardId,
             @PathVariable Integer sectionId,
             @RequestParam("file") MultipartFile file,
@@ -1041,7 +1041,7 @@ public class StandardController {
         // Delegate to service
         FileStorageResponseDTO uploaded = standardService.uploadFileToSection(file , userId, sectionId);
 
-        ApiResponse<FileStorageResponseDTO> response = new ApiResponse<>(
+        ApiResponseWrapper<FileStorageResponseDTO> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "File uploaded successfully",
                 uploaded
@@ -1053,14 +1053,14 @@ public class StandardController {
 
 
     @DeleteMapping("{standardId}/sections/{sectionId}/files/{fileId}")
-    public ResponseEntity<ApiResponse<String>> deleteFileFromSection(
+    public ResponseEntity<ApiResponseWrapper<String>> deleteFileFromSection(
             @PathVariable Integer standardId,
             @PathVariable Integer sectionId,
             @PathVariable Integer fileId
     ) {
         standardService.removeFileFromSection(fileId, sectionId);
 
-        ApiResponse<String> response = new ApiResponse<>(
+        ApiResponseWrapper<String> response = new ApiResponseWrapper<>(
                 HttpStatus.OK.value(),
                 "File removed successfully",
                 "File ID: " + fileId + " from Section ID: " + sectionId
