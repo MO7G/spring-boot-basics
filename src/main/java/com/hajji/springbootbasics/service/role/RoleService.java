@@ -1,4 +1,4 @@
-package com.hajji.springbootbasics.service;
+package com.hajji.springbootbasics.service.role;
 
 import com.hajji.springbootbasics.dto.role.CreateRoleDTO;
 import com.hajji.springbootbasics.dto.role.RolePermissionRequestDTO;
@@ -8,7 +8,10 @@ import com.hajji.springbootbasics.exceptions.role.RoleAlreadyExistsException;
 import com.hajji.springbootbasics.mapper.RoleMapper;
 import com.hajji.springbootbasics.model.Permission;
 import com.hajji.springbootbasics.model.Role;
+import com.hajji.springbootbasics.repository.ProjectAssignmentRepository;
 import com.hajji.springbootbasics.repository.RoleRepository;
+import com.hajji.springbootbasics.service.PermissionService;
+import com.hajji.springbootbasics.service.role.contracts.RoleProjectChecker;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +22,11 @@ import java.util.List;
 public class RoleService {
     private final RoleRepository roleRepository;
     private final PermissionService permissionService; // inject the service
-
-    public RoleService(RoleRepository roleRepository, PermissionService permissionService) {
+    private final ProjectAssignmentRepository projectAssignmentRepository;
+    public RoleService(RoleRepository roleRepository, PermissionService permissionService , ProjectAssignmentRepository projectAssignmentRepository) {
         this.roleRepository = roleRepository;
         this.permissionService = permissionService;
+        this.projectAssignmentRepository = projectAssignmentRepository;
     }
 
 
@@ -88,30 +92,52 @@ public class RoleService {
 
     @Transactional
     public RoleResponseDTO unassignPermission(RolePermissionRequestDTO requestDto) {
-        // 1️⃣ Fetch Role
+
         Role role = roleRepository.findById(requestDto.getRoleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found with ID: " + requestDto.getRoleId()));
 
-        // 2️⃣ Fetch Permission
+
         Permission permission = permissionService.getPermissionById(requestDto.getPermissionId());
 
-        // 3️⃣ Check if role actually has this permission
+
         if (!role.getPermissions().contains(permission)) {
             throw new IllegalStateException("Role does not have this permission assigned");
         }
 
-        // 4️⃣ Remove permission (owning side)
+
         role.getPermissions().remove(permission);
 
-        // Optional: update inverse side for in-memory consistency
         permission.getRoles().remove(role);
 
-        // 5️⃣ Save role
         role = roleRepository.save(role);
 
-        // 6️⃣ Map to DTO and return
         return RoleMapper.toRoleResponseDTO(role);
     }
+
+
+
+    @Transactional
+    public void deleteRole(Integer roleId) {
+
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with ID: " + roleId));
+
+        if (!role.getUsers().isEmpty()) {
+            throw new IllegalStateException("Cannot delete role: it is assigned to users.");
+        }
+
+        if (!role.getPermissions().isEmpty()) {
+            throw new IllegalStateException("Cannot delete role: it has permissions assigned.");
+        }
+
+        if (projectAssignmentRepository.existsByRoles_RoleId(roleId)) {
+            throw new IllegalStateException("Cannot delete role: it is assigned to projects.");
+        }
+
+        // ✅ Safe to delete
+        roleRepository.delete(role);
+    }
+
 
 
     @Transactional

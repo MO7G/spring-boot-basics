@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
 
+
 @SpringBootApplication
 @Slf4j
 public class SpringBootBasicsApplication {

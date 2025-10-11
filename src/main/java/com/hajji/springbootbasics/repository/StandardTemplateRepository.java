@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface StandardTemplateRepository extends JpaRepository<StandardTemplate, Integer> {
     // Add this method to find a template by file ID and section ID
     Optional<StandardTemplate> findByFile_FileIdAndSection_SectionId(Integer fileId, Integer sectionId);
-
+    boolean existsByFile_FileId(Integer fileId);
 }

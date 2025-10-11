@@ -10,4 +10,5 @@ import java.util.List;
 public interface ProjectDocumentRepository extends JpaRepository<ProjectDocument, Integer> {
     List<ProjectDocument> findByProject_ProjectId(Integer projectId);
     void deleteByProject_ProjectId(Integer projectId);
+    boolean existsByFile_FileId(Integer fileId);
 }

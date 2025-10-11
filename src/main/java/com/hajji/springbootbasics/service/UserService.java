@@ -60,7 +60,7 @@ public class UserService {
 
 
     @Transactional
-    public UserResponseDTO applyGeneralUpdates(UpdateUserRequestDTO dto) {
+    public UserResponseDTO update(UpdateUserRequestDTO dto) {
         if (!dto.getUserId().isProvided()) {
             throw new IllegalArgumentException("User ID is required for update");
         }

@@ -7,9 +7,7 @@ import com.hajji.springbootbasics.exceptions.fileStorage.InvalidFileTypeExceptio
 import com.hajji.springbootbasics.mapper.StandardMapper;
 import com.hajji.springbootbasics.mapper.StandardSectionMapper;
 import com.hajji.springbootbasics.model.*;
-import com.hajji.springbootbasics.repository.StandardRepository;
-import com.hajji.springbootbasics.repository.StandardSectionRepository;
-import com.hajji.springbootbasics.repository.StandardTemplateRepository;
+import com.hajji.springbootbasics.repository.*;
 import com.hajji.springbootbasics.utility.PaginationLogger;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
@@ -26,21 +24,25 @@ import java.util.stream.Collectors;
 public class StandardService {
 
     private final StandardRepository standardRepository;
-    private final StandardSectionRepository sectionRepository;
-    private UserService userService;
-    private FileStorageService fileStorageService;
-    private StandardTemplateRepository standardTemplateRepository;
-    public StandardService(StandardRepository standardRepository,
-                           StandardSectionRepository sectionRepository,
-                           UserService userService,
-                           FileStorageService fileStorageService,
-                           StandardTemplateRepository standardTemplateRepository) {
+    private final StandardSectionRepository standardSectionRepository;
+    private final UserService userService;
+    private final FileStorageService fileStorageService;
+    private final StandardTemplateRepository standardTemplateRepository;
+    private final ProjectRepository projectRepository;
+    private final ProjectDocumentRepository projectDocumentRepository;
+    private final DocumentRevisionRepository documentRevisionRepository;
+
+    public StandardService(StandardRepository standardRepository, StandardSectionRepository standardSectionRepository, UserService userService, FileStorageService fileStorageService, StandardTemplateRepository standardTemplateRepository, ProjectRepository projectRepository, ProjectDocumentRepository projectDocumentRepository, DocumentRevisionRepository documentRevisionRepository) {
         this.standardRepository = standardRepository;
-        this.sectionRepository = sectionRepository;
+        this.standardSectionRepository = standardSectionRepository;
         this.userService = userService;
         this.fileStorageService = fileStorageService;
         this.standardTemplateRepository = standardTemplateRepository;
+        this.projectRepository = projectRepository;
+        this.projectDocumentRepository = projectDocumentRepository;
+        this.documentRevisionRepository = documentRevisionRepository;
     }
+
 
     /* ---------------- STANDARD CRUD ---------------- */
 
@@ -127,12 +129,12 @@ public class StandardService {
         section.setModifiedAt(LocalDateTime.now());
 
         if (dto.getParentSectionId() != null) {
-            StandardSection parent = sectionRepository.findById(dto.getParentSectionId())
+            StandardSection parent = standardSectionRepository.findById(dto.getParentSectionId())
                     .orElseThrow(() -> new ResourceNotFoundException("Parent section not found with ID: " + dto.getParentSectionId()));
             section.setParentSection(parent);
         }
 
-        section = sectionRepository.save(section);
+        section = standardSectionRepository.save(section);
         return StandardSectionMapper.toDTO(section);
     }
 
@@ -188,7 +190,7 @@ public class StandardService {
 
     private void linkFileToSection(Integer fileId, Integer sectionId) {
         FileStorage file = fileStorageService.getFileById(fileId); // optional: fetch via service
-        StandardSection section = sectionRepository.findById(sectionId)
+        StandardSection section = standardSectionRepository.findById(sectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Section not found"));
 
         StandardTemplate template = new StandardTemplate();
@@ -206,7 +208,7 @@ public class StandardService {
     public FileStorageResponseDTO uploadFileToSection(MultipartFile file, Integer userId, Integer sectionId) {
 
         // 1. Fetch section & standard (domain validation)
-        StandardSection section = sectionRepository.findById(sectionId)
+        StandardSection section = standardSectionRepository.findById(sectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Section not found with ID: " + sectionId));
 
         // 2. Delegate the file saving to FileStorageService
@@ -271,6 +273,81 @@ public class StandardService {
 //        }
 
         return templates;
+    }
+
+
+
+    @Transactional
+    public StandardResponseDTO deleteSectionFromStandard(Integer standardId, Integer sectionId, boolean cascade) {
+        // validate standard & section
+        Standard standard = standardRepository.findById(standardId)
+                .orElseThrow(() -> new IllegalArgumentException("Standard not found with ID " + standardId));
+
+        StandardSection section = standardSectionRepository.findById(sectionId)
+                .orElseThrow(() -> new IllegalArgumentException("Section not found with ID " + sectionId));
+
+        if (!section.getStandard().getStandardId().equals(standardId)) {
+            throw new IllegalArgumentException("Section does not belong to the specified Standard");
+        }
+
+        boolean hasChildren = section.getChildSections() != null && !section.getChildSections().isEmpty();
+        if (hasChildren && !cascade) {
+            throw new IllegalStateException("Cannot delete this section because it has child sections. Enable cascade delete to proceed or delete children first.");
+        }
+
+        // If section has templates and cascade == false, block as well (optional - choose desired behavior)
+        boolean hasTemplates = section.getTemplates() != null && !section.getTemplates().isEmpty();
+        if (hasTemplates && !cascade) {
+            throw new IllegalStateException("Cannot delete this section because it has templates/files. Enable cascade delete to proceed or delete templates first.");
+        }
+
+        // Check if the section's standard is used by any project (prevent logical break)
+        if (projectRepository.existsByStandard_StandardId(standardId)) {
+            throw new IllegalStateException("Cannot delete this section because its parent standard is used by one or more projects.");
+        }
+
+        // Perform recursive delete (this will handle templates/files safely)
+        deleteSectionRecursively(section);
+
+        // Update standard timestamp
+        standard.setModifiedAt(LocalDateTime.now());
+        standardRepository.save(standard);
+
+        return StandardMapper.toResponseDTO(standard);
+    }
+
+    private void deleteSectionRecursively(StandardSection section) {
+        // Defensive copies to avoid ConcurrentModificationException and to detach iteration from changes
+        var children = new HashSet<>(section.getChildSections() == null ? Set.of() : section.getChildSections());
+        for (StandardSection child : children) {
+            deleteSectionRecursively(child);
+        }
+
+        // Handle templates -> file deletion
+        var templates = new HashSet<>(section.getTemplates() == null ? Set.of() : section.getTemplates());
+        for (StandardTemplate template : templates) {
+            FileStorage file = template.getFile();
+
+            // Delete the template row first (unlink section -> template)
+            standardTemplateRepository.delete(template);
+
+            // Now check if the file is referenced anywhere else (other templates, project docs, revisions)
+            if (file != null && file.getFileId() != null) {
+                Integer fileId = file.getFileId();
+                boolean stillReferenced =
+                        standardTemplateRepository.existsByFile_FileId(fileId) ||
+                                projectDocumentRepository.existsByFile_FileId(fileId) ||
+                                documentRevisionRepository.existsByFile_FileId(fileId);
+
+                if (!stillReferenced) {
+                    // call your file deletion service (make sure it deletes physical file AND DB record if desired)
+                    fileStorageService.deleteFile(fileId);
+                }
+            }
+        }
+
+        // Finally delete the section itself
+        standardSectionRepository.delete(section);
     }
 
 

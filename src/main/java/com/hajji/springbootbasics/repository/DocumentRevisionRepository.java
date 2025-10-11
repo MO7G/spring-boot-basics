@@ -12,4 +12,6 @@ public interface DocumentRevisionRepository extends JpaRepository<DocumentRevisi
     void deleteByProjectDocument_ProjectDocumentId(Integer projectId);
     @Query("SELECT MAX(r.versionNumber) FROM DocumentRevision r WHERE r.projectDocument.projectDocumentId = :projectDocumentId")
     Optional<Integer> findMaxVersionByProjectDocumentId(Integer projectDocumentId);
+
+    boolean existsByFile_FileId(Integer fileId);
 }

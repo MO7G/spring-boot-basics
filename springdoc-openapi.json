@@ -1,0 +1,2845 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Role Controller",
+      "description": "Manages user roles and their associated permissions, including creating roles, listing roles, and assigning/unassigning permissions."
+    },
+    {
+      "name": "Project Controller",
+      "description": "Handles project management operations such as creating projects, assigning users, deleting projects, and uploading new document versions."
+    },
+    {
+      "name": "Standards",
+      "description": "Endpoints for managing ISO standards, sections, and file uploads"
+    },
+    {
+      "name": "Customers",
+      "description": "Endpoints for managing customers"
+    },
+    {
+      "name": "User Controller",
+      "description": "Handles user management operations including creation, retrieval, update, and deletion of users."
+    },
+    {
+      "name": "Permissions",
+      "description": "Endpoints for managing user permissions"
+    },
+    {
+      "name": "Status Controller",
+      "description": "Manages system statuses including Standard Status and Document Status creation and retrieval."
+    }
+  ],
+  "paths": {
+    "/api/user/create": {
+      "post": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Create a new user",
+        "description": "Creates a new user with the provided details.",
+        "operationId": "createUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperUserResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/status/standard/create": {
+      "post": {
+        "tags": [
+          "Status Controller"
+        ],
+        "summary": "Create a standard status",
+        "description": "Creates a new standard status record in the system with the provided details.",
+        "operationId": "createStandardStatus",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStandardStatusRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperStandardStatusResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/status/document/create": {
+      "post": {
+        "tags": [
+          "Status Controller"
+        ],
+        "summary": "Create a document status",
+        "description": "Creates a new document status entry for tracking document workflow states.",
+        "operationId": "createDocumentStatus",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentStatusRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperDocumentStatusResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/standard/{standardId}/sections/{sectionId}/upload": {
+      "post": {
+        "tags": [
+          "Standards"
+        ],
+        "summary": "Upload a file to a section",
+        "description": "Uploads a single PDF file to the specified section. Multiple files per request are not allowed.",
+        "operationId": "uploadFileToSection",
+        "parameters": [
+          {
+            "name": "standardId",
+            "in": "path",
+            "description": "ID of the standard",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sectionId",
+            "in": "path",
+            "description": "ID of the section",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "User ID of the uploader",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "description": "File to upload (PDF only)",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperFileStorageResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/standard/{standardId}/sections/create": {
+      "post": {
+        "tags": [
+          "Standards"
+        ],
+        "summary": "Create a section under a standard",
+        "description": "Adds a new section to a specific ISO standard identified by its ID.",
+        "operationId": "createSection",
+        "parameters": [
+          {
+            "name": "standardId",
+            "in": "path",
+            "description": "ID of the parent standard",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStandardSectionRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperStandardSectionResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/standard/create": {
+      "post": {
+        "tags": [
+          "Standards"
+        ],
+        "summary": "Create a new standard",
+        "description": "Creates a new ISO standard using the provided details.",
+        "operationId": "createStandard",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStandardRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperStandardResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/role/unassignPermission": {
+      "post": {
+        "tags": [
+          "Role Controller"
+        ],
+        "summary": "Unassign permission from a role",
+        "description": "Removes an existing permission from a role using the provided role and permission IDs.",
+        "operationId": "unassignPermissionFromRole",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolePermissionRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperRoleResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/role/create": {
+      "post": {
+        "tags": [
+          "Role Controller"
+        ],
+        "summary": "Create a new role",
+        "description": "Creates a new role with the specified name and description.",
+        "operationId": "createRole",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperRoleResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/role/addPermission": {
+      "post": {
+        "tags": [
+          "Role Controller"
+        ],
+        "summary": "Assign permission to a role",
+        "description": "Adds a specific permission to the given role based on role and permission IDs.",
+        "operationId": "addPermissionToRole",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolePermissionRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperRoleResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/project/{projectId}/documents/{projectDocumentId}/upload": {
+      "post": {
+        "tags": [
+          "Project Controller"
+        ],
+        "summary": "Upload a new version of a project document",
+        "description": "Uploads a new version of an existing project document, optionally including a change note for version tracking.",
+        "operationId": "uploadNewVersion",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "projectDocumentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "customerId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "changeNote",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/project/create": {
+      "post": {
+        "tags": [
+          "Project Controller"
+        ],
+        "summary": "Create a new project",
+        "description": "Creates a new project using the provided details such as name, description, and customer information.",
+        "operationId": "createProject",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProjectRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperProjectResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/project/assign": {
+      "post": {
+        "tags": [
+          "Project Controller"
+        ],
+        "summary": "Assign a user to a project with a role",
+        "description": "Assigns a specific user to a given project and associates them with a defined role (e.g., manager, developer).",
+        "operationId": "assignUserToProject",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignUserToProjectRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/permission/create": {
+      "post": {
+        "tags": [
+          "Permissions"
+        ],
+        "summary": "Create a new permission",
+        "description": "Creates a new permission entry using the provided request data.",
+        "operationId": "createPermission",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePermissionRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperPermissionResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/files/templateUpload/upload": {
+      "post": {
+        "tags": [
+          "file-storage-controller"
+        ],
+        "operationId": "uploadFile",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperFileStorageResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/customer/create": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Create a new customer",
+        "description": "Creates a new customer using the provided details.",
+        "operationId": "createCustomer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCustomerRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperCustomerResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/update": {
+      "patch": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Update an existing user",
+        "description": "Applies partial updates to an existing user based on the provided data.",
+        "operationId": "applyGeneralUpdates",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperUserResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/standard/update": {
+      "patch": {
+        "tags": [
+          "Standards"
+        ],
+        "summary": "Update a standard",
+        "description": "Update an ISO standard using the provided details.",
+        "operationId": "updateStandard",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStandardRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperStandardResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/customer/update": {
+      "patch": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Update an existing customer",
+        "description": "Updates one or more fields of an existing customer record.",
+        "operationId": "applyGeneralUpdates_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomerRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperCustomerResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/all": {
+      "get": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Fetch all users with pagination",
+        "description": "Retrieves a paginated list of users. Default page=0, size=10.",
+        "operationId": "getAllUsers",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperListUserResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/status/standard/all": {
+      "get": {
+        "tags": [
+          "Status Controller"
+        ],
+        "summary": "Get all standard statuses",
+        "description": "Retrieves a list of all standard statuses available in the system.",
+        "operationId": "getAllStandardStatuses",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperListStandardStatusResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/status/document/all": {
+      "get": {
+        "tags": [
+          "Status Controller"
+        ],
+        "summary": "Get all document statuses",
+        "description": "Fetches all document statuses that define document lifecycle states.",
+        "operationId": "getAllDocumentStatuses",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperListDocumentStatusResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/standard/{standardId}/treeView": {
+      "get": {
+        "tags": [
+          "Standards"
+        ],
+        "summary": "Get standard section tree",
+        "description": "Fetches the hierarchical tree of all sections for a given standard.",
+        "operationId": "getStandardSectionTree",
+        "parameters": [
+          {
+            "name": "standardId",
+            "in": "path",
+            "description": "ID of the standard",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperStandardSectionTreeDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/standard/all": {
+      "get": {
+        "tags": [
+          "Standards"
+        ],
+        "summary": "Get all standards with pagination",
+        "description": "Retrieves a paginated list of all ISO standards. Default page=0, size=20.",
+        "operationId": "getAllStandards",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperListStandardResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/role/all": {
+      "get": {
+        "tags": [
+          "Role Controller"
+        ],
+        "summary": "Get all roles",
+        "description": "Fetches all available roles in the system.",
+        "operationId": "getAllRoles",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperListRoleResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/permission/all": {
+      "get": {
+        "tags": [
+          "Permissions"
+        ],
+        "summary": "Get all permissions",
+        "description": "Fetches a list of all available permissions in the system.",
+        "operationId": "getAllPermission",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperListPermission"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/customer/all": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Get all customers with pagination",
+        "description": "Retrieves a paginated list of customers. Default page=0, size=20.",
+        "operationId": "getAllCustomers",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperListCustomerResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/delete/{id}": {
+      "delete": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Delete a user",
+        "description": "Deletes an existing user from the system by their ID.",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/standard/{standardId}/sections/{sectionId}/files/{fileId}": {
+      "delete": {
+        "tags": [
+          "Standards"
+        ],
+        "summary": "Delete a file from a section",
+        "description": "Removes a specific file by ID from the given section.",
+        "operationId": "deleteFileFromSection",
+        "parameters": [
+          {
+            "name": "standardId",
+            "in": "path",
+            "description": "Standard ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sectionId",
+            "in": "path",
+            "description": "Section ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "fileId",
+            "in": "path",
+            "description": "File ID to delete",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/standard/delete/{standardId}": {
+      "delete": {
+        "tags": [
+          "Standards"
+        ],
+        "summary": "Delete a standard",
+        "description": "Deletes an existing ISO standard by its ID.",
+        "operationId": "deleteStandard",
+        "parameters": [
+          {
+            "name": "standardId",
+            "in": "path",
+            "description": "ID of the standard to delete",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/project/delete/{projectId}": {
+      "delete": {
+        "tags": [
+          "Project Controller"
+        ],
+        "summary": "Delete a project",
+        "description": "Deletes a project permanently based on the given project ID.",
+        "operationId": "deleteProject",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/permission/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Permissions"
+        ],
+        "summary": "Delete a permission",
+        "description": "Deletes a specific permission identified by its ID. Set forceDelete=true if needed.",
+        "operationId": "deletePermission",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperPermissionResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/customer/delete/{customerId}": {
+      "delete": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Delete a customer",
+        "description": "Deletes a customer by ID. Optionally, set forceDelete=true to remove related records.",
+        "operationId": "deleteCustomer",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "forceDelete",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperString"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateUserRequestDTO": {
+        "required": [
+          "email",
+          "firstName",
+          "lastName",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "lastName": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 30,
+            "minLength": 10,
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponseWrapperUserResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserResponseDTO"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserResponseDTO": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateStandardStatusRequestDTO": {
+        "required": [
+          "statusName"
+        ],
+        "type": "object",
+        "properties": {
+          "statusName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseWrapperStandardStatusResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/StandardStatusResponseDTO"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "StandardStatusResponseDTO": {
+        "type": "object",
+        "properties": {
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "statusName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateDocumentStatusRequestDTO": {
+        "required": [
+          "statusName"
+        ],
+        "type": "object",
+        "properties": {
+          "statusName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseWrapperDocumentStatusResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DocumentStatusResponseDTO"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DocumentStatusResponseDTO": {
+        "type": "object",
+        "properties": {
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "statusName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseWrapperFileStorageResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/FileStorageResponseDTO"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "FileStorageResponseDTO": {
+        "type": "object",
+        "properties": {
+          "fileId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "filePath": {
+            "type": "string"
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "uploadedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uploadedByUserId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "uploadedByCustomerId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreateStandardSectionRequestDTO": {
+        "required": [
+          "number",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "standardId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "number": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentSectionId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ApiResponseWrapperStandardSectionResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/StandardSectionResponseDTO"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "StandardSectionResponseDTO": {
+        "type": "object",
+        "properties": {
+          "sectionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "number": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "standardId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentSectionId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreateStandardRequestDTO": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "version": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "publishedDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "ApiResponseWrapperStandardResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/StandardResponseDTO"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "StandardResponseDTO": {
+        "type": "object",
+        "properties": {
+          "standardId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "publishedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RolePermissionRequestDTO": {
+        "required": [
+          "permissionId",
+          "roleId"
+        ],
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "permissionId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ApiResponseWrapperRoleResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RoleResponseDTO"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RoleResponseDTO": {
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roleName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateRoleDTO": {
+        "required": [
+          "roleName"
+        ],
+        "type": "object",
+        "properties": {
+          "roleName": {
+            "pattern": "^[A-Z_]+$",
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 500,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseWrapperString": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateProjectRequestDTO": {
+        "required": [
+          "customerId",
+          "standardId"
+        ],
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "standardId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ApiResponseWrapperProjectResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ProjectResponseDTO"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ProjectDocumentDTO": {
+        "type": "object",
+        "properties": {
+          "projectDocumentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "templateId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fileId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "versionNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lastModifiedBy": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ProjectResponseDTO": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "customerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "standardId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completionDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "projectDocuments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectDocumentDTO"
+            }
+          }
+        }
+      },
+      "AssignUserToProjectRequestDTO": {
+        "required": [
+          "projectId",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roleId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreatePermissionRequestDTO": {
+        "required": [
+          "permissionName"
+        ],
+        "type": "object",
+        "properties": {
+          "permissionName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "pattern": "^[A-Z_]+$",
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 500,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseWrapperPermissionResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PermissionResponseDTO"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PermissionResponseDTO": {
+        "type": "object",
+        "properties": {
+          "permissionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "permissionName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateCustomerRequestDTO": {
+        "required": [
+          "email",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseWrapperCustomerResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CustomerResponseDTO"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CustomerResponseDTO": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PatchFieldBoolean": {
+        "type": "object",
+        "properties": {
+          "provided": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PatchFieldInteger": {
+        "type": "object",
+        "properties": {
+          "provided": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PatchFieldString": {
+        "type": "object",
+        "properties": {
+          "provided": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateUserRequestDTO": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/PatchFieldInteger"
+          },
+          "firstName": {
+            "$ref": "#/components/schemas/PatchFieldString"
+          },
+          "lastName": {
+            "$ref": "#/components/schemas/PatchFieldString"
+          },
+          "isActive": {
+            "$ref": "#/components/schemas/PatchFieldBoolean"
+          }
+        }
+      },
+      "UpdateStandardRequestDTO": {
+        "type": "object",
+        "properties": {
+          "standardId": {
+            "$ref": "#/components/schemas/PatchFieldInteger"
+          },
+          "name": {
+            "$ref": "#/components/schemas/PatchFieldString"
+          },
+          "version": {
+            "$ref": "#/components/schemas/PatchFieldString"
+          }
+        }
+      },
+      "UpdateCustomerRequestDTO": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "$ref": "#/components/schemas/PatchFieldInteger"
+          },
+          "name": {
+            "$ref": "#/components/schemas/PatchFieldString"
+          },
+          "email": {
+            "$ref": "#/components/schemas/PatchFieldString"
+          }
+        }
+      },
+      "ApiResponseWrapperListUserResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserResponseDTO"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseWrapperListStandardStatusResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StandardStatusResponseDTO"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseWrapperListDocumentStatusResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentStatusResponseDTO"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseWrapperStandardSectionTreeDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/StandardSectionTreeDTO"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SectionNodeDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "number": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "StandardSectionTreeDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SectionNodeDTO"
+            }
+          },
+          "number": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponseWrapperListStandardResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StandardResponseDTO"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseWrapperListRoleResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleResponseDTO"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseWrapperListPermission": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uploadedFilesByCustomer": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileStorage"
+            }
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "projects": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            }
+          }
+        }
+      },
+      "DocumentRevision": {
+        "type": "object",
+        "properties": {
+          "revisionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "versionNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "changeNote": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "projectDocument": {
+            "$ref": "#/components/schemas/ProjectDocument"
+          },
+          "modifiedByUserId": {
+            "$ref": "#/components/schemas/User"
+          },
+          "file": {
+            "$ref": "#/components/schemas/FileStorage"
+          }
+        }
+      },
+      "DocumentStatus": {
+        "type": "object",
+        "properties": {
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "statusName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "projectDocuments": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectDocument"
+            }
+          }
+        }
+      },
+      "FileStorage": {
+        "type": "object",
+        "properties": {
+          "fileId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "filePath": {
+            "type": "string"
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "uploadedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uploadedByUser": {
+            "$ref": "#/components/schemas/User"
+          },
+          "uploadedByCustomer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "standardTemplates": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StandardTemplate"
+            }
+          },
+          "projectDocuments": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectDocument"
+            }
+          },
+          "documentRevisions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentRevision"
+            }
+          }
+        }
+      },
+      "Permission": {
+        "type": "object",
+        "properties": {
+          "permissionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "permissionName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "roles": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completionDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "standard": {
+            "$ref": "#/components/schemas/Standard"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ProjectStatus"
+          },
+          "projectDocuments": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectDocument"
+            }
+          },
+          "assignments": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectAssignment"
+            }
+          }
+        }
+      },
+      "ProjectAssignment": {
+        "type": "object",
+        "properties": {
+          "assignmentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assignedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "project": {
+            "$ref": "#/components/schemas/Project"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "roles": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          }
+        }
+      },
+      "ProjectDocument": {
+        "type": "object",
+        "properties": {
+          "projectDocumentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "versionNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "project": {
+            "$ref": "#/components/schemas/Project"
+          },
+          "template": {
+            "$ref": "#/components/schemas/StandardTemplate"
+          },
+          "file": {
+            "$ref": "#/components/schemas/FileStorage"
+          },
+          "status": {
+            "$ref": "#/components/schemas/DocumentStatus"
+          },
+          "lastModifiedBy": {
+            "$ref": "#/components/schemas/User"
+          },
+          "revisions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentRevision"
+            }
+          }
+        }
+      },
+      "ProjectStatus": {
+        "type": "object",
+        "properties": {
+          "statusId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "statusName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "projects": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            }
+          }
+        }
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roleName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "users": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "permissions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          }
+        }
+      },
+      "Standard": {
+        "type": "object",
+        "properties": {
+          "standardId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "publishedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sections": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StandardSection"
+            }
+          },
+          "projects": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            }
+          }
+        }
+      },
+      "StandardSection": {
+        "type": "object",
+        "properties": {
+          "sectionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "number": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "standard": {
+            "$ref": "#/components/schemas/Standard"
+          },
+          "parentSection": {
+            "$ref": "#/components/schemas/StandardSection"
+          },
+          "childSections": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StandardSection"
+            }
+          },
+          "templates": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StandardTemplate"
+            }
+          }
+        }
+      },
+      "StandardTemplate": {
+        "type": "object",
+        "properties": {
+          "templateId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "section": {
+            "$ref": "#/components/schemas/StandardSection"
+          },
+          "file": {
+            "$ref": "#/components/schemas/FileStorage"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "passwordHash": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "roles": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "uploadedFilesByUser": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileStorage"
+            }
+          },
+          "uploadedFilesByCustomer": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileStorage"
+            }
+          },
+          "projectAssignments": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectAssignment"
+            }
+          },
+          "modifiedDocuments": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectDocument"
+            }
+          },
+          "documentRevisions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentRevision"
+            }
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponseWrapperListCustomerResponseDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerResponseDTO"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseWrapperVoid": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

@@ -72,4 +72,33 @@ public class StatusService {
         return documentStatus;
     }
 
+
+
+    @Transactional
+    public void deleteStandardStatus(Integer statusId) {
+        ProjectStatus status = projectStatusRepository.findById(statusId)
+                .orElseThrow(() -> new IllegalArgumentException("Standard status not found with ID " + statusId));
+
+        // Check if status is associated with any projects
+        if (status.getProjects() != null && !status.getProjects().isEmpty()) {
+            throw new IllegalStateException("Cannot delete this standard status because it is assigned to one or more projects.");
+        }
+
+        projectStatusRepository.delete(status);
+    }
+
+    @Transactional
+    public void deleteDocumentStatus(Integer statusId) {
+        DocumentStatus status = documentStatusRepository.findById(statusId)
+                .orElseThrow(() -> new IllegalArgumentException("Document status not found with ID " + statusId));
+
+        // Check if status is associated with any project documents
+        if (status.getProjectDocuments() != null && !status.getProjectDocuments().isEmpty()) {
+            throw new IllegalStateException("Cannot delete this document status because it is assigned to one or more project documents.");
+        }
+
+        documentStatusRepository.delete(status);
+    }
+
+
 }

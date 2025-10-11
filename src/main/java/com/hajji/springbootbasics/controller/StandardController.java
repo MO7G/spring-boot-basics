@@ -37,15 +37,14 @@ public class StandardController {
         this.standardService = standardService;
     }
 
+
+
     /* ---------------- STANDARD CRUD ---------------- */
-
-
-    // Fetch Standards with Pagination
+    @GetMapping("/all")
     @Operation(
             summary = "Get all standards with pagination",
             description = "Retrieves a paginated list of all ISO standards. Default page=0, size=20."
     )
-    @GetMapping("/all")
     public ResponseEntity<ApiResponseWrapper<List<StandardResponseDTO>>> getAllStandards(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
@@ -64,12 +63,12 @@ public class StandardController {
 
 
 
-    // Create a Standard
+
+    @PostMapping("/create")
     @Operation(
             summary = "Create a new standard",
             description = "Creates a new ISO standard using the provided details."
     )
-    @PostMapping("/create")
     public ResponseEntity<ApiResponseWrapper<StandardResponseDTO>> createStandard(
             @Valid @RequestBody CreateStandardRequestDTO requestDTO) {
 
@@ -83,12 +82,12 @@ public class StandardController {
     }
 
 
-    // Update Standard
+
+    @PatchMapping("/update")
     @Operation(
             summary = "Update a standard",
             description = "Update an ISO standard using the provided details."
     )
-    @PatchMapping("/update")
     public ResponseEntity<ApiResponseWrapper<StandardResponseDTO>> updateStandard(
             @Valid @RequestBody UpdateStandardRequestDTO requestDTO) {
 
@@ -102,12 +101,12 @@ public class StandardController {
     }
 
 
-    // Delete A Standard
+
+    @DeleteMapping("/delete/{standardId}")
     @Operation(
             summary = "Delete a standard",
             description = "Deletes an existing ISO standard by its ID."
     )
-    @DeleteMapping("/delete/{standardId}")
     public ResponseEntity<ApiResponseWrapper<String>> deleteStandard(
             @Parameter(description = "ID of the standard to delete") @PathVariable Integer standardId) {
 
@@ -120,15 +119,16 @@ public class StandardController {
         ));
     }
 
+
+
+
     /* ---------------- SECTION CRUD ---------------- */
 
-
-    // Create Sections
+    @PostMapping("/{standardId}/sections/create")
     @Operation(
             summary = "Create a section under a standard",
             description = "Adds a new section to a specific ISO standard identified by its ID."
     )
-    @PostMapping("/{standardId}/sections/create")
     public ResponseEntity<ApiResponseWrapper<StandardSectionResponseDTO>> createSection(
             @Parameter(description = "ID of the parent standard") @PathVariable Integer standardId,
             @Valid @RequestBody CreateStandardSectionRequestDTO dto) {
@@ -144,12 +144,12 @@ public class StandardController {
     }
 
 
-    //
+
+    @GetMapping("/{standardId}/treeView")
     @Operation(
             summary = "Get standard section tree",
             description = "Fetches the hierarchical tree of all sections for a given standard."
     )
-    @GetMapping("/{standardId}/treeView")
     public ResponseEntity<ApiResponseWrapper<StandardSectionTreeDTO>> getStandardSectionTree(
             @Parameter(description = "ID of the standard") @PathVariable Integer standardId) {
 
@@ -163,6 +163,37 @@ public class StandardController {
     }
 
 
+    @DeleteMapping("/{standardId}/sections/delete/{sectionId}")
+    @Operation(
+            summary = "Delete a section from a standard",
+            description = "Deletes a section. If cascade=true, deletes all child sections too."
+    )
+    public ResponseEntity<ApiResponseWrapper<String>> deleteSection(
+            @PathVariable Integer standardId,
+            @PathVariable Integer sectionId,
+            @RequestParam(defaultValue = "true") boolean cascade) {
+
+        standardService.deleteSectionFromStandard(standardId, sectionId, cascade);
+
+        ApiResponseWrapper<String> response = new ApiResponseWrapper<>(
+                HttpStatus.OK.value(),
+                cascade
+                        ? "Section and its children deleted successfully"
+                        : "Section deleted successfully",
+                "Section ID: " + sectionId + " from Standard ID: " + standardId
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -172,12 +203,11 @@ public class StandardController {
 
 
     /* ----------------Section FILE UPLOAD ---------------- */
-
+    @PostMapping("/{standardId}/sections/{sectionId}/upload")
     @Operation(
             summary = "Upload a file to a section",
-            description = "Uploads a single PDF file to the specified section. Multiple files per request are not allowed."
+            description = "Uploads a single PDF file to the specified section. Multiple files per request are not allowed"
     )
-    @PostMapping("/{standardId}/sections/{sectionId}/upload")
     public ResponseEntity<ApiResponseWrapper<FileStorageResponseDTO>> uploadFileToSection(
             @Parameter(description = "ID of the standard") @PathVariable Integer standardId,
             @Parameter(description = "ID of the section") @PathVariable Integer sectionId,
@@ -200,11 +230,12 @@ public class StandardController {
         ));
     }
 
+
+    @DeleteMapping("/{standardId}/sections/{sectionId}/files/{fileId}")
     @Operation(
             summary = "Delete a file from a section",
             description = "Removes a specific file by ID from the given section."
     )
-    @DeleteMapping("/{standardId}/sections/{sectionId}/files/{fileId}")
     public ResponseEntity<ApiResponseWrapper<String>> deleteFileFromSection(
             @Parameter(description = "Standard ID") @PathVariable Integer standardId,
             @Parameter(description = "Section ID") @PathVariable Integer sectionId,

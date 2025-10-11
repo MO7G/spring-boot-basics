@@ -1,4 +1,4 @@
-package com.hajji.springbootbasics.service;
+package com.hajji.springbootbasics.service.project;
 
 import com.hajji.springbootbasics.dto.file.FileStorageResponseDTO;
 import com.hajji.springbootbasics.dto.project.CreateProjectRequestDTO;
@@ -10,6 +10,9 @@ import com.hajji.springbootbasics.mapper.FileStorageMapper;
 import com.hajji.springbootbasics.mapper.ProjectMapper;
 import com.hajji.springbootbasics.model.*;
 import com.hajji.springbootbasics.repository.*;
+import com.hajji.springbootbasics.service.*;
+import com.hajji.springbootbasics.service.role.contracts.RoleProjectChecker;
+import com.hajji.springbootbasics.service.role.RoleService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import org.springframework.stereotype.Service;
@@ -20,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-public class ProjectService {
+public class ProjectService  {
 
     private final ProjectRepository projectRepository;
     private final ProjectAssignmentRepository projectAssignmentRepository;
@@ -45,6 +48,9 @@ public class ProjectService {
         this.roleService = roleService;
         this.fileStorageService = fileStorageService;
     }
+
+
+
 
     @Transactional
     public ProjectResponseDTO createProject(CreateProjectRequestDTO dto) {
@@ -179,6 +185,7 @@ public class ProjectService {
         ProjectDocument document = projectDocumentRepository.findById(projectDocumentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
 
+
         if (document.getProject().getProjectId() != projectId) {
             throw new ValidationException("Document does not belong to specified project");
         }
@@ -221,6 +228,9 @@ public class ProjectService {
 
         documentRevisionRepository.save(revision);
     }
+
+
+
 
 
 }

@@ -2,6 +2,7 @@ package com.hajji.springbootbasics.service;
 
 import com.hajji.springbootbasics.dto.customer.CreateCustomerRequestDTO;
 import com.hajji.springbootbasics.dto.customer.CustomerResponseDTO;
+import com.hajji.springbootbasics.dto.customer.UpdateCustomerRequestDTO;
 import com.hajji.springbootbasics.exceptions.common.ResourceNotFoundException;
 import com.hajji.springbootbasics.mapper.CustomerMapper;
 import com.hajji.springbootbasics.model.Customer;
@@ -38,7 +39,7 @@ public class CustomerService {
 
         Customer customer = CustomerMapper.toEntity(dto);
         customer = customerRepository.save(customer);
-        return CustomerMapper.toDTO(customer);
+        return CustomerMapper.toResponseDTO(customer);
     }
 
 
@@ -48,9 +49,27 @@ public class CustomerService {
         PaginationLogger.logPageFetch("customers", pageable);
         Page<Customer> customerPage = customerRepository.findAll(pageable);
         return customerPage.stream()
-                .map(CustomerMapper::toDTO)
+                .map(CustomerMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public CustomerResponseDTO updateCustomer(UpdateCustomerRequestDTO dto) {
+        if (!dto.getCustomerId().isProvided()) {
+            throw new IllegalArgumentException("Customer ID is required for update");
+        }
+
+        Customer customer = customerRepository.findById(dto.getCustomerId().get())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Customer not found with ID " + dto.getCustomerId().get()));
+
+        // 🧠 Delegate all patch resolution to mapper
+        CustomerMapper.updateEntity(customer, dto);
+
+        Customer updated = customerRepository.save(customer);
+        return CustomerMapper.toResponseDTO(updated);
+    }
+
 
 
 

@@ -12,4 +12,5 @@ public interface ProjectAssignmentRepository extends JpaRepository<ProjectAssign
     Optional<ProjectAssignment> findByProject_ProjectIdAndUser_UserId(Integer projectId, Integer userId);
     List<ProjectAssignment> findByProject_ProjectId(Integer projectId);
     void  deleteByProject_ProjectId(Integer projectId);
+    boolean existsByRoles_RoleId(Integer roleId);
 }

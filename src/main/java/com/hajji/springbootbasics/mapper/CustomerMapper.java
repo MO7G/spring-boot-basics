@@ -2,7 +2,10 @@ package com.hajji.springbootbasics.mapper;
 
 import com.hajji.springbootbasics.dto.customer.CreateCustomerRequestDTO;
 import com.hajji.springbootbasics.dto.customer.CustomerResponseDTO;
+import com.hajji.springbootbasics.dto.customer.UpdateCustomerRequestDTO;
 import com.hajji.springbootbasics.model.Customer;
+
+import java.time.LocalDateTime;
 
 public class CustomerMapper {
 
@@ -15,7 +18,7 @@ public class CustomerMapper {
         return customer;
     }
 
-    public static CustomerResponseDTO toDTO(Customer customer) {
+    public static CustomerResponseDTO toResponseDTO(Customer customer) {
         CustomerResponseDTO dto = new CustomerResponseDTO();
         dto.setCustomerId(customer.getCustomerId());
         dto.setName(customer.getName());
@@ -24,4 +27,16 @@ public class CustomerMapper {
         dto.setModifiedAt(customer.getModifiedAt());
         return dto;
     }
+
+
+    // PATCH update logic — only mapper handles field resolution
+    public static void updateEntity(Customer customer, UpdateCustomerRequestDTO dto) {
+        if (customer == null || dto == null) return;
+
+        dto.getName().ifProvided(customer::setName);
+        dto.getEmail().ifProvided(customer::setEmail);
+
+        customer.setModifiedAt(LocalDateTime.now());
+    }
+
 }
