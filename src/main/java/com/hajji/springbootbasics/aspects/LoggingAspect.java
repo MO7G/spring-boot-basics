@@ -13,8 +13,8 @@ import java.util.Arrays;
 public class LoggingAspect {
 
     /**
-     * 🧩 Define where the aspect applies:
-     * - Any public method in controller or service packages
+      Define where the aspect applies:
+      Any public method in controller or service packages
      */
     @Pointcut("execution(public * com.hajji.springbootbasics.controller..*(..)) || " +
             "execution(public * com.hajji.springbootbasics.service..*(..))")
@@ -23,7 +23,7 @@ public class LoggingAspect {
     }
 
     /**
-     * 🚀 Before method execution
+     Before method execution
      */
     @Before("applicationPackagePointcut()")
     public void logBefore(JoinPoint joinPoint) {
@@ -34,7 +34,7 @@ public class LoggingAspect {
     }
 
     /**
-     * ✅ After returning successfully
+      After returning successfully
      */
     @AfterReturning(pointcut = "applicationPackagePointcut()", returning = "result")
     public void logAfterReturning(JoinPoint joinPoint, Object result) {
@@ -45,7 +45,7 @@ public class LoggingAspect {
     }
 
     /**
-     * ❌ After throwing an exception
+      After throwing an exception
      */
     @AfterThrowing(pointcut = "applicationPackagePointcut()", throwing = "ex")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable ex) {
@@ -56,7 +56,7 @@ public class LoggingAspect {
     }
 
     /**
-     * ⏱️ Around advice - measure execution time
+      Around advice - measure execution time
      */
     @Around("applicationPackagePointcut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {

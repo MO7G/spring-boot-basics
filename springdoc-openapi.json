@@ -143,7 +143,7 @@
           "Standards"
         ],
         "summary": "Upload a file to a section",
-        "description": "Uploads a single PDF file to the specified section. Multiple files per request are not allowed.",
+        "description": "Uploads a single PDF file to the specified section. Multiple files per request are not allowed",
         "operationId": "uploadFileToSection",
         "parameters": [
           {
@@ -1019,6 +1019,72 @@
         }
       }
     },
+    "/api/status/project/{statusId}": {
+      "delete": {
+        "tags": [
+          "Status Controller"
+        ],
+        "summary": "Delete a standard status",
+        "description": "Deletes a standard status by its ID. Will fail if it is associated with any projects.",
+        "operationId": "deleteStandardStatus",
+        "parameters": [
+          {
+            "name": "statusId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/status/document/{statusId}": {
+      "delete": {
+        "tags": [
+          "Status Controller"
+        ],
+        "summary": "Delete a document status",
+        "description": "Deletes a document status by its ID. Will fail if it is associated with any project documents.",
+        "operationId": "deleteDocumentStatus",
+        "parameters": [
+          {
+            "name": "statusId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/standard/{standardId}/sections/{sectionId}/files/{fileId}": {
       "delete": {
         "tags": [
@@ -1073,6 +1139,57 @@
         }
       }
     },
+    "/api/standard/{standardId}/sections/delete/{sectionId}": {
+      "delete": {
+        "tags": [
+          "Standards"
+        ],
+        "summary": "Delete a section from a standard",
+        "description": "Deletes a section. If cascade=true, deletes all child sections too.",
+        "operationId": "deleteSection",
+        "parameters": [
+          {
+            "name": "standardId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "cascade",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/standard/delete/{standardId}": {
       "delete": {
         "tags": [
@@ -1086,6 +1203,39 @@
             "name": "standardId",
             "in": "path",
             "description": "ID of the standard to delete",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseWrapperString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/role/delete/{roleId}": {
+      "delete": {
+        "tags": [
+          "Role Controller"
+        ],
+        "summary": "delete a Role ",
+        "description": "Deletes an existing role using the role id !!",
+        "operationId": "deleteRole",
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "integer",

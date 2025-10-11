@@ -87,6 +87,7 @@ public class StatusService {
         projectStatusRepository.delete(status);
     }
 
+
     @Transactional
     public void deleteDocumentStatus(Integer statusId) {
         DocumentStatus status = documentStatusRepository.findById(statusId)

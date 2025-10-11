@@ -166,9 +166,8 @@ public class StandardService {
         return dto;
     }
 
-    /**
-     * Recursively maps a StandardSection into  SectionNodeDTO
-     */
+
+     // Recursively maps a StandardSection into  SectionNodeDTO
     private SectionNodeDTO mapSectionToTreeNode(StandardSection section) {
         // Map children recursively
         List<SectionNodeDTO> childNodes = section.getChildSections().stream()

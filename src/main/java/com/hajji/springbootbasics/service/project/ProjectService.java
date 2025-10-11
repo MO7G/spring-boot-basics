@@ -210,9 +210,8 @@ public class ProjectService  {
         projectDocumentRepository.save(document);
     }
 
-    /**
-     * 🧩 Helper: Handles creation of a new DocumentRevision.
-     */
+
+     // Helper: Handles creation of a new DocumentRevision.
     private void recordDocumentRevision(ProjectDocument document,
                                         FileStorageResponseDTO fileStorageResponseDTO,
                                         int newVersion,
